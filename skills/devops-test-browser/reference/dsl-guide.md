@@ -608,6 +608,22 @@ needs one real Test Hub run.
 - Pitfalls: coordinate clicks need a same-scale screenshot and mis-hit under OS scaling; ref-based
   clicks go stale after navigation; JS `el.click()` bypasses visibility checks, so it is fine for
   *reaching* a page during discovery but proves nothing about whether Test Hub can click it.
+- **Reachability, not just visibility.** A real Test Hub click needs the element *reachable* — hit
+  by `document.elementFromPoint(cx, cy)` at its own centre, not covered and not off-screen. An
+  element with a layout box but sitting below the fold reports `visible:true` yet `reachable:false`,
+  and the click burns its full timeout then fails with no "Object not found" reason **[project run,
+  Maximo]**. Test Hub does **not** always scroll an element inside an `<iframe>`'s own inner
+  viewport into view, so an in-frame control far down the frame stays unreachable. Check
+  `elementFromPoint` on every click target during grounding; if it's false, find a reachable route
+  (activate a tab/panel that brings it into view, or interact with an equivalent control that is in
+  view) rather than trusting a JS-click that "worked".
+- **Every element step needs an `object:` that matches the real tag/proxyName.** A `verify`/`assign`
+  written with only `identifiers` (no `object:`) can fail to resolve — Test Hub labels it "Verify
+  **undefined** …" and returns "Object not found" even when its own element dump shows the element
+  present, visible and reachable **[project run]**. And the object must match the tag: an `<a>`
+  styled as a button (Maximo ids ending `_a`) is `html.a`, not `html.button`; the wrong type times
+  out. Read the tag/`proxyName` from the live DOM (or the step metadata dump) and set `object`
+  accordingly.
 
 ### Reusing confirmed facts — `LIVE-NOTES.md`
 

@@ -235,6 +235,27 @@ applications, records, and controls are available.
    (product sample `frames/nested-frames.dtx.yaml`), so ordinary steps work — but a probe that
    finds "no controls" from the top document is looking in the wrong place. The rich-text editor is
    a frame *inside* that frame and remains unsupported for `type`.
+- **Reachability, not just presence — and object type must match the tag** (both cost a first
+   pilot run, 2026-09-17). A recorder ID captured with a live JS `.click()` can be *present and
+   visible but not reachable* for a real Test Hub click: the left "Common Actions" nav on a record
+   places options far down the iframe (e.g. `m74daaf83_ns_menu_METREAD_OPTION_a` "Enter Meter
+   Readings" at ~y1154) and Test Hub does not scroll the iframe's inner viewport to them — the click
+   times out and fails. Bring the target into view first via a reachable control (activating the
+   **Meters** tab moved that option to ~y499), and prefer directly-editable in-dialog cells (the
+   Enter Meter Readings dialog's New Reading column `m114fece6_tdrow_[C:2]_txt-tb[R:0]`) over an
+   off-screen filter/View-Details path. Verify `document.elementFromPoint` on every recorder click
+   during grounding. Separately, set `object:` to the real tag: Maximo controls whose id ends `_a`
+   are `<a>` (`html.a`), not `html.button` (`m524afe2e_..._addrow-pb_addrow_a` "New Row" failed as
+   `html.button`); the toolbar app-name `toolbar2-chld_appName` is a `<table>` (`html.table`), and a
+   `verify`/`assign` with no `object:` at all resolves to nothing ("Verify undefined … Object not
+   found") even when the element is plainly there.
+- **Diagnose runs from the results REST API, not just the PDF** (works from a browser logged into
+   the Test Hub server): `GET /test/rest/projects/{id}/results/{resultId}/data/views/functional/
+   summary/` gives per-step verdicts and stepStatistics; each failing step in the report links a
+   `Metadata` bucket (`…/data/buckets/{b}/items/{i}/content`) that is Test Hub's own element dump
+   with `exist/visible/reachable/proxyName/content` at failure time — read it before changing a
+   selector. Confirm the run's `Git` line (repo/branch/commit) first; project 6450 has three repos
+   connected and same-named assets are ambiguous.
 
 ### Record context and Maximo dynamic controls
 
