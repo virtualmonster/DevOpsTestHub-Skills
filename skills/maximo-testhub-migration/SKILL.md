@@ -249,6 +249,16 @@ applications, records, and controls are available.
    `html.button`); the toolbar app-name `toolbar2-chld_appName` is a `<table>` (`html.table`), and a
    `verify`/`assign` with no `object:` at all resolves to nothing ("Verify undefined … Object not
    found") even when the element is plainly there.
+   - **When an in-iframe control is below the fold, fix the viewport - don't hack the click.** A
+     `js:` locator that `scrollIntoView`s the element does make Test Hub *find* it (the click step
+     passes), but the click then mis-fires across the frame boundary - the element resolves inside
+     `manage-shell_Iframe` while the click coordinates resolve in the wrong frame, so nothing
+     happens and no dialog opens (run 4247: the "Enter Meter Readings" Common Action at y~1153 in a
+     ~1015-1065px iframe viewport). The clean, general fix is a **taller execution browser
+     viewport** (larger pod virtual display / window height) so the control renders on-screen and an
+     ordinary click reaches it - this fixes every off-screen in-iframe control at once, with no
+     per-test locators. Treat a persistently-off-screen recorder control as a viewport/execution
+     issue, not a selector defect, and don't let a `js:`-locator false-pass mask it.
 - **Diagnose runs from the results REST API, not just the PDF** (works from a browser logged into
    the Test Hub server): `GET /test/rest/projects/{id}/results/{resultId}/data/views/functional/
    summary/` gives per-step verdicts and stepStatistics; each failing step in the report links a
