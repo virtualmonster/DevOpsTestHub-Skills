@@ -143,8 +143,16 @@ applications, records, and controls are available.
          - val: "//span[contains(@id,'_tdrow_[C:1]_ttxt-lb[R:0]')]"
    ```
 
-- Use structured property values for both IDs and XPath expressions. Never use scalar
-   `id: value` or `xpath: value` forms.
+- Use the item-list form for **every** property value (`visible: [- val: 'true']`,
+   `content: [- val: X]`, `id: [- val: X]`), never a scalar. The target server runs schema
+   **2026/05** (`GET /test/content/schemas/script.json`), which has no scalar `Field` form and no
+   bare-string `verify`; `run: out:` targets must be `{}`/lists, not names. Check the `$id` of any
+   new server before authoring; the validator enforces these forms.
+- Before diagnosing any failure, read the report's **Git line**: Test Hub project 6450 has three
+   repositories connected (internal `MaximoPerfTests` with a stale `stu` branch, GitHub
+   `Migrated-Maximo-Test-Framework`, GitHub `MaximoSamples`) and same-named assets are ambiguous.
+   The step `Metadata` link is Test Hub's element dump (`exist/visible/reachable/proxyName`);
+   `proxyName` is the `object` suffix.
 - Run path resolution, YAML parsing, `git diff --check`, and a TestHub execution for every new
    module composition. A module that validates independently may still fail at its caller boundary.
 
@@ -175,7 +183,11 @@ applications, records, and controls are available.
              identifiers: [{ properties: [{ content: [{ val: Accept All }] }] }]
    ```
    Add a second `if` for the `button#truste-consent-required` (`Required only`) variant if the pod
-   ever presents it; both variants coexisting harmlessly beats guessing which one runs.
+   ever presents it; both variants coexisting harmlessly beats guessing which one runs. The
+   recorder has also captured `html.button` content `Accept all` (lower-case) and
+   `//img[@id='truste-consent-close']` on this instance (MaximoSamples, 2026-03) — the banner's
+   markup varies by TrustArc version, so keep every variant guarded, never a hard click.
+   Confirmed on the execution pod 2026-09-17: the `Accept All` span click passed.
 - Keep dismissal in one no-`open` module composed after login. An element `wait` or `verify`
    must carry an explicit `stepTimeout` (one runner reported `duration is null` without it).
 

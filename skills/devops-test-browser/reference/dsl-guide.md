@@ -422,10 +422,16 @@ Each property value is either a scalar (shorthand for `val`) or a list of operat
 - id:      [{ js: 'value => value.startsWith("m")' }]
 ```
 
-**Scalar shorthand is schema-valid and is what the product corpus uses.** One Test Hub *visual
-editor* version observed in this project rejected scalar `id:`/`xpath:` (“items expects an
-array”) **[project run]** — so use the structured `[{val: ...}]` form when the assets will be
-opened in that editor; it is never wrong, merely verbose.
+**Always write property values as item lists (`[{val: …}]`).** The scalar shorthand is valid
+only in schema 2026/07 and later; the deployed server checked in this project runs **2026/05,
+whose `Field` has no scalar option** — the editor reports “Incorrect type. Expected array |
+object(expr)” and the visual view refuses to open the file **[project run, server schema]**.
+The list form is accepted by every version. See "Server schema versions" below.
+
+Additional property keys seen in recorder output on a real MAS instance **[sample-adjacent:
+MaximoSamples recording]**: `aria-label`, `data-testid`, `class` (full class string), `tagName`,
+`value` (an input's current value — `assign … properties: [{value: [{var: X}]}]` captures a
+generated record number), and objects `html.svg` / `html.path` for icon buttons.
 
 Quote XPath containing `:` or `[`…`]` **[YAML]**: `xpath: [{ val: "//span[contains(@id,'_tdrow_[C:1]')]" }]`.
 
@@ -527,6 +533,28 @@ legacy/updated.*]**: `pause: {duration: 1s}` → `wait: 1s`; root-level `vars`/`
 `configuration:`; `timeout:` is not a field (use `stepTimeout`); `:xpath` keys are not valid.
 `applicationName`/`description` in a `.dtc.yaml` are not in `component.json` — an editor
 artifact; the schema rejects them.
+
+## Server schema versions — check before authoring
+
+The schema a Test Hub server enforces is served at `GET /test/content/schemas/script.json`
+(readable from a browser logged into that server); its `$id` ends in the version. The vendor
+corpus bundled here is **2026/07**; the server in this project runs **2026/05**. Diffing the two
+definition-by-definition **[server schema vs `schemas/script.json`]**:
+
+| Definition | 2026/05 (deployed) | 2026/07 (corpus) | Rule that works on both |
+|---|---|---|---|
+| `Field` (property values) | list of items, or `{items: [...]}` | also a plain scalar | always `key: [{val: …}]` |
+| `VerifyStep` | list of JS expressions, or object form | also a bare JS string | `verify: [expr]` or the object form |
+| `Vars` (`run: out:` targets) | list, or `{vars: [...]}`, or `{}` | also a bare name string | `out: {RESULT: {}}` or `out: {RESULT: [MY_VAR]}` |
+| `Step`, `Action`, `FieldItem`, `Locator` | no `maxProperties: 1` | `maxProperties: 1` | still write exactly one key — the runtime expects it |
+| everything else (18 steps, `if` element form, `assign`, `press`, `open` `context`/`attach`, datasets, `type: column`, `secret`) | identical | identical | — |
+
+When a file opens in the code view but the visual view says "parsing error", it is a schema
+violation, not YAML: hover the squiggle; the message names the expected type.
+
+Datasets can carry **encrypted columns**: a recorder-made `userdata.csv` on this project holds
+an encrypted `password` column with the `.csv.metadata` sidecar listing it under `encHdrs`. The
+tool performs the encryption — never hand-author the sidecar or paste a plain password.
 
 ## Project-observed runtime behaviours (version-specific; re-verify if a run contradicts)
 
