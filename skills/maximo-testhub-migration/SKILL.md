@@ -56,7 +56,13 @@ Exclude by default:
    - `.dtc.yaml` for the Maximo web component;
    - `.dtx.yaml` for each independent UI test or module;
    - `.dts.yaml` for a smoke suite;
-   - `.ddf`/`.cgen` only when the selected UI flow needs data-driven values.
+   - instance-specific seeds (record IDs, sites, orgs, meter names) in `data/<env>/seeds.csv`,
+     one row per environment, bound with `configuration: {dataset: data/${MAXIMO_ENV}/seeds.csv}`
+     and `type: column` vars, so a customer swaps data rather than YAML. Verify every seed value
+     against the target instance (read-only `mxapi*` GETs from an authenticated browser work well:
+     `mxapiassetmeter?oslc.where=active=1` for metered assets, `mxapiwodetail` for editable work
+     orders) and record the evidence in the data README. Keep `.ddf`/`.cgen` generators for
+     synthesised values only.
 6. Translate TestNG behavior deliberately. Use `concurrent`/`sequential` only where tests are independent or stateful. Do not carry over shared/static WebDriver state.
 7. Move credentials to TestHub secret-backed variables or environment configuration. Never copy source passwords into generated assets.
 8. Validate schemas, suite paths, `run:` references, target URLs, and `git diff --check`.
