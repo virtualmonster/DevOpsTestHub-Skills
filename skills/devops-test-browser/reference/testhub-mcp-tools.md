@@ -142,3 +142,27 @@ user shares a Test Hub report (screenshot or description):
   handling — grepped for `alert`/`prompt`/`dialog`/`handler`/`unhandled` across every schema,
   found nothing), say so plainly and point the user at Test Hub's own docs/support rather than
   guessing a third or fourth time at unverifiable syntax.
+
+## Forensics without the MCP server — the report and the REST API
+
+When the user shares a Functional Report (PDF), or is logged into Test Hub in the same Chrome
+profile as the browser tool, everything needed to diagnose a failure is reachable read-only:
+
+- **Check the `Git` line first** (`<repository> / <branch> / <commit>`). A project can have several
+  repositories connected, and same-named assets in two repositories are ambiguous — a run can
+  silently execute a stale copy. Confirm the commit exists in the repository you pushed to before
+  diagnosing anything else. `GET /test/rest/projects/{id}/repositories/` and
+  `GET /test/rest/projects/{id}/branches/` (trailing slashes required) list what the project tracks
+  and the indexed commit per repository. The vendor OpenAPI specs are in the DSL corpus
+  (`TestHub-APIOnly/schemas/openapi-testassets.yaml`).
+- **Read the failed step's metadata, not just its verdict.** Each step in the report links a
+  `Metadata` URL (`/test/rest/projects/{id}/data/buckets/{bucket}/items/{item}/content`). It is
+  Test Hub's own element-proxy dump of the page at that moment: a tree of nodes with `tagname`,
+  `id`, `content`, and the decisive flags `exist`, `visible`, `reachable`, `enabled`, plus
+  `proxyName`/`proxyClass`. "Object not found" with `exist: true, visible: false, reachable: false`
+  means the element was there but hidden — fix the interaction order, not the locator.
+- **`proxyName` is the `object` vocabulary.** `inputtext`, `inputimage`, `table`, `iframe`
+  (`HtmlFrameProxy`) … map directly to `html.<proxyName>`. Read it off the dump instead of guessing
+  from the tag.
+- Extract PDF text with PyMuPDF when the Read tool cannot rasterise (`fitz`), and print with
+  `PYTHONIOENCODING=utf-8` — the reports contain icon glyphs that break cp1252 consoles.
