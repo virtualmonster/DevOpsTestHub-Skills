@@ -1,0 +1,25 @@
+note: Unit test for trivial tab using run context
+configuration:
+  vars:
+    TEST_ENDPOINT: ${stub('http://trivial-tab')}
+steps:
+  - run: trivial-tab.dtv.yaml
+  - log: After stub
+  - open:
+      url: '${TEST_ENDPOINT}'
+  - with:
+      note: Served by HCL OneTest Script
+      steps:
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content: Other
+        - open:
+            note: Served by HCL OneTest Script
+            url: ${TEST_ENDPOINT}/other.html
+            attach: 'true'
+            context: newtabcontext
+  - run:
+      url: trivial-tab-module.dtx.yaml
+      context: newtabcontext

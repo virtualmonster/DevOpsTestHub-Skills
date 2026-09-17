@@ -1,0 +1,20 @@
+configuration:
+  vars:
+    STATUS: X
+steps:
+  - log: In the parent script, STATUS var value is ${STATUS}
+  - run:
+      note: Invoking a module in the modules directory
+      url: modules/status.dtx.yaml
+      out:
+        STATUS_OUT: STATUS
+  - log: |
+      Back in the parent script, STATUS var value is ${STATUS}
+      About to invoke a failing module
+  - run:
+      note: |
+        The module that is being invoked here will fail.
+        The failure will prevent further steps within this script from executing.
+        When a script invokes another script, failures propagate back to the calling script.
+      url: modules/failing.dtx.yaml
+  - log: This step will not be executed due to the failure

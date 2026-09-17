@@ -1,0 +1,6 @@
+note: Run only test2.dtx.yaml in dir a
+tests:
+  - url: a/*.dtx.yaml
+    excludes:
+      - a/test*
+      - '!a/test2*.yaml'

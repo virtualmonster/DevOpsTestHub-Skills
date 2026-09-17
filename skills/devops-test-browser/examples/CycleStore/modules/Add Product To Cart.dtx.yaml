@@ -1,0 +1,60 @@
+note: Extracted from Checkout Product.dtx.yaml
+configuration: {}
+steps:
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: ../SendIt Cycles - Premium Mountain Bikes_x2wzva.dti.jpeg#111
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Shop Now
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: ../SendIt Cycles - Premium Mountain Bikes_nqi3uv.dti.jpeg#177
+            object: html.img
+            identifiers:
+              - properties:
+                  - src:
+                      - val: /api/images/2-trailblazer-elite.jpg
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: ../SendIt Cycles - Premium Mountain Bikes_7kmjcz.dti.jpeg#335
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: L
+        - click:
+            shot: ../SendIt Cycles - Premium Mountain Bikes_py54dp.dti.jpeg#464
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Add to Cart
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - verify:
+            shot: ../SendIt Cycles - Premium Mountain Bikes_i3fd7c.dti.jpeg#593
+            object: html.h1
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Shopping Cart
+            properties:
+              - content:
+                  - val: Shopping Cart
+        - click:
+            shot: ../SendIt Cycles - Premium Mountain Bikes_i3fd7c.dti.jpeg#593
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Checkout

@@ -1,0 +1,39 @@
+note: Extracted from Checkout Product.dtx.yaml
+configuration:
+  vars:
+    Email: stuart@hcl.com
+    Password: password123
+steps:
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: ../SendIt Cycles - Premium Mountain Bikes_laj32z.dti.jpeg#651
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Email
+        - type:
+            shot: ../SendIt Cycles - Premium Mountain Bikes_l7pdhs.dti.jpeg#720
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Email
+            value: '${Email}'
+        - type:
+            shot: ../SendIt Cycles - Premium Mountain Bikes_d7guge.dti.jpeg#792
+            object: html.inputpassword
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Password
+            value: '${Password}'
+        - click:
+            shot: ../SendIt Cycles - Premium Mountain Bikes_hmwjmh.dti.jpeg#932
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Sign In

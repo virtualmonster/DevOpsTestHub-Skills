@@ -1,0 +1,4 @@
+tests:
+  - Register User.dtx.yaml
+  - Checkout Product.dtx.yaml
+  - Admin Portal Login.dtx.yaml

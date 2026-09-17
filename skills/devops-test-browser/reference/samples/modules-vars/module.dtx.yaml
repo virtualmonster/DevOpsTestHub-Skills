@@ -1,0 +1,19 @@
+configuration:
+  vars:
+    FOO: foo
+    BAR:
+      expr: bar
+      modifier: out
+    BAZ:
+      expr: baz
+      modifier: local
+steps:
+  - run: ../utils/var-funcs.dtx.yaml
+  - log: 'module entry: foo ${varToString("FOO")}, bar ${varToString("BAR")}, baz:
+      ${varToString("BAZ")}'
+  - assign:
+      vars:
+        FOO: 'hello '
+        BAR: world
+        BAZ: '!'
+  - log: 'module exit: ${FOO}${BAR}${BAZ}'

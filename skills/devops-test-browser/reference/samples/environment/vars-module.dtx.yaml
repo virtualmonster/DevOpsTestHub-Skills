@@ -1,0 +1,9 @@
+configuration:
+  vars:
+    PARENT_ENV_VAR: {}
+    CHILD_ENV_VAR: {}
+    PARENT_ENV_VAR_FROM_SECRET: {}
+steps:
+  - log: '${PARENT_ENV_VAR}'
+  - log: '${CHILD_ENV_VAR}'
+  - log: '${PARENT_ENV_VAR_FROM_SECRET}'

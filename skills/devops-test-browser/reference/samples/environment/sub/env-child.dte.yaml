@@ -1,0 +1,6 @@
+includes:
+  - env-child-2.dte.yaml
+defaultUser: ACTOR1
+secrets: mySecretCollectionIgnored
+vars:
+  CHILD_ENV_VAR: childVal

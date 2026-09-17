@@ -1,0 +1,193 @@
+note: Validate checkout behavior with invalid card number
+configuration:
+  profile: edge
+  vars:
+    APP_CycleStore_URL: http://10.134.60.215:3000/
+    Email: stuart@hcl.com
+    Password: password123
+    First_Name: Stuart
+    Last_Name: Walker
+    Phone: '0123456789'
+    Address: 101 The Street
+    City: The Town
+    State_Province: London
+    Zip_Code: ABC 123
+    Country: United Kingdom
+    Cardholder_Name: S Walker
+    CVV: '123'
+steps:
+  - open:
+      url: '${APP_CycleStore_URL}'
+  - with:
+      steps:
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Shop Now
+        - click:
+            object: html.img
+            identifiers:
+              - properties:
+                  - src:
+                      - val: /api/images/1-swift-xc-pro.jpg
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: L
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Add to Cart
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Checkout
+  - with:
+      steps:
+        - type:
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Email
+            value: '${Email}'
+        - type:
+            object: html.inputpassword
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Password
+            value: '${Password}'
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Sign In
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: |-
+                          🛒
+                          1
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Checkout
+  - with:
+      steps:
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: First Name *
+            value: '${First_Name}'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Last Name *
+            value: '${Last_Name}'
+        - type:
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Email *
+            value: '${Email}'
+        - type:
+            object: html.inputtextfield
+            identifiers:
+              - properties:
+                  - xpath:
+                      - val: //div[@id='root']/div/main/div/div/div/form/section/div[3]/input
+            value: '${Phone}'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Address *
+            value: '${Address}'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: City *
+            value: '${City}'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: State/Province *
+            value: '${State_Province}'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Zip Code *
+            value: '${Zip_Code}'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Country *
+            value: '${Country}'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Cardholder Name *
+            value: '${Cardholder_Name}'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Card Number *
+            value: '12345'
+        - select:
+            object: html.select
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Month *
+            value: '09'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: CVV *
+            value: '${CVV}'
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Complete Purchase
+        - verify:
+            object: html.h1
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Checkout

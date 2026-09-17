@@ -1,0 +1,81 @@
+note: Unit test for UI actions
+configuration:
+  vars:
+    TEST_ENDPOINT: ${stub('http://contact-us')}
+    CLASS_TO_LOCATE:
+      expr: custom
+      modifier: local
+steps:
+  - run: contact-us-element-locator.dtv.yaml
+  - log: After stub
+  - with:
+      steps:
+        - send:
+            url: '${TEST_ENDPOINT}'
+        - open:
+            url: '${TEST_ENDPOINT}'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - placeholder: Name
+            value: Tester
+        - type:
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - placeholder:
+                      - val: '!Name'
+                      - includes: address
+            value: unit-test@uta.test
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - placeholder: Subject
+            value: Complaint
+        - type:
+            object: html.textarea
+            identifiers:
+              - properties:
+                  - placeholder: Message
+            value: Hi from unit test
+        - select:
+            object: html.select
+            identifiers:
+              - properties:
+                  - placeholder: Country
+            value: India
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - placeholder: Name
+                locators:
+                  - position: '2'
+            value: Testing
+        - type:
+            object: html.inputtext
+            identifiers:
+              - locators:
+                  - js: return document.querySelector('input[class="${CLASS_TO_LOCATE}"]')
+            value: Custom value
+        - verify:
+            object: html.inputtext
+            identifiers:
+              - locators:
+                  - js: return document.querySelector('input[class="${CLASS_TO_LOCATE}"]')
+            properties:
+              - content: Custom value
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Reset
+                locators:
+                  - position: '2'
+        - click:
+            object: html.inputsubmit
+            identifiers:
+              - properties:
+                  - content: Update

@@ -1,0 +1,48 @@
+configuration:
+  vars:
+    TEST_ENDPOINT: ${stub('http://controls')}
+    assignVariable: initialValue
+steps:
+  - run: html-controls.dtv.yaml
+  - log: After stub
+  - with:
+      steps:
+        - open:
+            url: '${TEST_ENDPOINT}'
+        - click:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                locators:
+                  - above:
+                      object: html.inputemail
+                      properties:
+                        - label: 'Email:'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                locators:
+                  - rightof:
+                      object: html.label
+                      properties:
+                        - content: 'Name:'
+                      locators:
+                        - above:
+                            object: html.label
+                            properties:
+                              - content: 'Email:'
+            value: testname
+        - type:
+            object: html.inputpassword
+            identifiers:
+              - properties:
+                  - label: 'Password:'
+            value: pass
+        - click:
+            object: html.inputradio
+            identifiers:
+              - properties:
+                  - label: Male

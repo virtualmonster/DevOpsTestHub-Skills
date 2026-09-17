@@ -1,0 +1,49 @@
+{
+  "$schema" : "http://json-schema.org/draft-07/schema#",
+  "$id" : "https://www.hcl-software.com/schema/devops/test/DatabaseQuery/2026/07",
+  "type" : "object",
+  "properties" : {
+    "note" : {
+      "type" : "string"
+    },
+    "meta" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "string"
+      }
+    },
+    "transport" : {
+      "$ref" : "#/definitions/Link"
+    },
+    "connection" : {
+      "format" : "val",
+      "type" : "string"
+    },
+    "statement" : {
+      "format" : "val",
+      "type" : "string"
+    }
+  },
+  "additionalProperties" : false,
+  "definitions" : {
+    "Link" : {
+      "oneOf" : [ {
+        "title" : "url",
+        "format" : "val-uri-reference",
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "properties" : {
+          "url" : {
+            "format" : "val-uri-reference",
+            "type" : "string"
+          },
+          "type" : {
+            "type" : "string"
+          }
+        },
+        "additionalProperties" : false
+      } ]
+    }
+  }
+}

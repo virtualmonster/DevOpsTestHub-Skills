@@ -1,0 +1,37 @@
+note: Add one product to cart from PDP
+configuration:
+  profile: edge
+  vars:
+    APP_SendItCycles_Shop_URL: http://10.134.60.215:3000/shop
+steps:
+  - open:
+      note: Open shop page
+      url: '${APP_SendItCycles_Shop_URL}'
+  - with:
+      steps:
+        - click:
+            object: html.img
+            identifiers:
+              - properties:
+                  - src:
+                      - val: /api/images/1-swift-xc-pro.jpg
+  - with:
+      steps:
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: L
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Add to Cart
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Checkout

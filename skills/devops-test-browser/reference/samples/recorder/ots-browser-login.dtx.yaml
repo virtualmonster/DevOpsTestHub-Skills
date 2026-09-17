@@ -1,0 +1,26 @@
+configuration:
+  cache: 'true'
+  vars:
+    DEPLOYMENT_URL: https://master-hcl.tp-k8s.nonprod.hclpnp.com
+    USER: {}
+    _PASSWORD: {}
+steps:
+  - open:
+      url: '${DEPLOYMENT_URL}'
+  - type:
+      object: html.inputtext
+      identifiers:
+        - properties:
+            - label: Username
+      value: '${USER}'
+  - type:
+      object: html.inputpassword
+      identifiers:
+        - properties:
+            - label: Password
+      value: '${_PASSWORD}'
+  - click:
+      object: html.button
+      identifiers:
+        - properties:
+            - content: Sign In

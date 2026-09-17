@@ -1,0 +1,24 @@
+note: |
+  This script gives an example of basic variable usage.
+  The default value for script variables are provided in the "vars" section.
+  Variables can also be set or updated using an assign step.
+  Variables values can be referenced using dollar syntax ${}
+  Code within ${} is evaluated as JavaScript.
+configuration:
+  vars:
+    COLOR: red
+    ELEVEN_AS_STRING: ${"11"}
+    ELEVEN_AS_NUMBER: '11'
+steps:
+  - log: The COLOR variable value is ${COLOR}
+  - log: The COLOR variable value in uppercase is ${COLOR.toUpperCase()}
+  - log: ${ELEVEN_AS_STRING} is a string value with length ${ELEVEN_AS_STRING.length}
+  - log: |
+      ${ELEVEN_AS_NUMBER} is a numeric value that is one less than ${ELEVEN_AS_NUMBER + 1}
+  - assign:
+      vars:
+        COLOR: green
+        NAME: Alice
+  - log: |
+      The COLOR variable value is now ${COLOR} and the NAME variable has been set to ${NAME}
+  - run: scoped-variables.dtx.yaml

@@ -1,0 +1,86 @@
+note: Generated from recorded traffic using edge 145.0.3800.65
+configuration:
+  profile: edge
+  vars:
+    APP_CycleStore_URL: http://10.134.60.215:3000/
+    Email: admin@senditcycles.com
+    Password: admin123
+steps:
+  - open:
+      note: Open CycleStore
+      url: '${APP_CycleStore_URL}'
+  - log: {}
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_4efney.dti.jpeg#102
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Login
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_zrvzih.dti.jpeg#210
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Email
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_7fmcas.dti.jpeg#278
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Email
+            value: '${Email}'
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_w344ww.dti.jpeg#349
+            object: html.inputpassword
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Password
+            value: '${Password}'
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_g7umue.dti.jpeg#487
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Sign In
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_qhbzrs.dti.jpeg#542
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Admin
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_ba6lju.dti.jpeg#640
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Products
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_yezib6.dti.jpeg#728
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Categories
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_2klz3o.dti.jpeg#878
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Logout

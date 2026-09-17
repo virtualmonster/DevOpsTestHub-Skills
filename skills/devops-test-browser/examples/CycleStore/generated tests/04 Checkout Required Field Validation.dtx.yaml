@@ -1,0 +1,92 @@
+note: Validate required fields on checkout form
+configuration:
+  profile: edge
+  vars:
+    APP_CycleStore_URL: http://10.134.60.215:3000/
+    Email: stuart@hcl.com
+    Password: password123
+steps:
+  - open:
+      url: '${APP_CycleStore_URL}'
+  - with:
+      steps:
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Shop Now
+        - click:
+            object: html.img
+            identifiers:
+              - properties:
+                  - src:
+                      - val: /api/images/1-swift-xc-pro.jpg
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: L
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Add to Cart
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Checkout
+  - with:
+      steps:
+        - type:
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Email
+            value: '${Email}'
+        - type:
+            object: html.inputpassword
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Password
+            value: '${Password}'
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Sign In
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: |-
+                          🛒
+                          1
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Checkout
+  - with:
+      steps:
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Complete Purchase
+        - verify:
+            object: html.h1
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Checkout

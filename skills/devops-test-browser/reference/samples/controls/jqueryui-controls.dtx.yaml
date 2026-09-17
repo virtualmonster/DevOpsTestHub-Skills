@@ -1,0 +1,88 @@
+configuration:
+  vars:
+    TEST_ENDPOINT: ${stub('http://jqueryuicontrols')}
+    Autocomplete: as
+    InDate: 03/03/2026
+steps:
+  - run: jqueryui-controls.dtv.yaml
+  - log: After stub
+  - with:
+      steps:
+        - open:
+            url: '${TEST_ENDPOINT}'
+        - click:
+            object: jquery.jqmcollapsibleheader
+            identifiers:
+              - properties:
+                  - content: Third
+        - click:
+            object: jquery.jqmcollapsibleheader
+            identifiers:
+              - properties:
+                  - content: First
+        - click:
+            object: jquery.jqmsearchinput
+            identifiers:
+              - properties:
+                  - label: Autocomplete
+        - type:
+            object: jquery.jqmsearchinput
+            identifiers:
+              - properties:
+                  - label: Autocomplete
+            value: asp
+        - click:
+            object: jquery.jqmbutton
+            identifiers:
+              - properties:
+                  - content: A button element
+                locators:
+                  - below:
+                      object: jquery.jqmsearchinput
+                      properties:
+                        - label: Autocomplete
+        - click:
+            object: jquery.jqmbutton
+            identifiers:
+              - properties:
+                  - content: A submit button
+                locators:
+                  - above:
+                      object: jquery.jqmradio
+                      properties:
+                        - content: London
+        - click:
+            object: jquery.jqmradio
+            identifiers:
+              - properties:
+                  - content: New York
+        - click:
+            object: jquery.jqmcheckbox
+            identifiers:
+              - properties:
+                  - content: 3 Star
+        - click:
+            object: jquery.jqmcheckbox
+            identifiers:
+              - properties:
+                  - content: 4 Star
+        - click:
+            object: jquery.jqmcheckbox
+            identifiers:
+              - properties:
+                  - content: Insurance
+        - click:
+            object: jquery.jquimenuitem
+            identifiers:
+              - properties:
+                  - content: Books
+                locators:
+                  - inside:
+                      object: jquery.jqmselect
+                      properties:
+                        - label: Toys (n/a)
+        - click:
+            object: jquery.jquitab
+            identifiers:
+              - properties:
+                  - content: First

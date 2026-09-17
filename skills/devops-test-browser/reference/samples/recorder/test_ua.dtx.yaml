@@ -1,0 +1,51 @@
+note: Generated from recorded traffic
+configuration:
+  vars:
+    APP_AMAZON_URL: https://www.amazon.in/
+steps:
+  - open:
+      note: Open amazonss
+      meta:
+        browserName: edge
+        browserVersion: 128.0.2739.67
+        platformName: windows
+      url: '${APP_AMAZON_URL}'
+  - with:
+      note: 'Online Shopping site in India: Shop Online for Mobiles, Books, Watches,
+        Shoes and More - Amazon.in'
+      steps:
+        - click:
+            shot: shot/2ecx6w.dti.jpeg#2107
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Best Sellers
+                locators:
+                  - position: '1'
+        - log: wwewewwwewbvjgvgjjvg
+  - with:
+      note: 'Amazon.in Bestsellers: The most popular items on Amazon'
+      steps:
+        - click:
+            shot: shot/m6evck.dti.jpeg#3423
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Amazon Launchpad
+                locators:
+                  - position: '1'
+  - with:
+      note: 'Amazon.in Bestsellers: The most popular items in Amazon Launchpad'
+      steps:
+        - click:
+            shot: shot/km2d2u.dti.jpeg#3351
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Location
+              - properties:
+                  - xpath:
+                      - val: //div[@id='CardInstanceh8Ws79pZ9mOmKGoD2QlJrg']/div[2]/div[2]/div[11]/a

@@ -1,0 +1,59 @@
+note: Unit test for nested frames
+configuration:
+  vars:
+    TEST_ENDPOINT: ${stub('http://nested-frames')}
+    Input_in_frame_1: a
+    Input_in_inner_frame: b
+    Input_in_inner_inner_top_frame: c
+    Input_in_inner_inner_bottom_frame: d
+steps:
+  - run: nested-frames.dtv.yaml
+  - log: After stub
+  - with:
+      steps:
+        - open:
+            url: '${TEST_ENDPOINT}'
+        - click:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Input in frame 1:'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Input in frame 1:'
+            value: '${Input_in_frame_1}'
+        - click:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Input in inner frame:'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Input in inner frame:'
+            value: '${Input_in_inner_frame}'
+        - click:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Input in inner, inner top frame:'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Input in inner, inner top frame:'
+            value: '${Input_in_inner_inner_top_frame}'
+        - click:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Input in inner, inner bottom frame:'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Input in inner, inner bottom frame:'
+            value: '${Input_in_inner_inner_bottom_frame}'

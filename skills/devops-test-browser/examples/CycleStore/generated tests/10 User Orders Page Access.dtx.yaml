@@ -1,0 +1,56 @@
+note: Login as standard user and access orders page
+configuration:
+  profile: edge
+  vars:
+    APP_CycleStore_URL: http://10.134.60.215:3000/
+    Email: stuart@hcl.com
+    Password: password123
+steps:
+  - open:
+      url: '${APP_CycleStore_URL}'
+  - with:
+      steps:
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Login
+        - type:
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Email
+            value: '${Email}'
+        - type:
+            object: html.inputpassword
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Password
+            value: '${Password}'
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Sign In
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Orders
+        - verify:
+            object: html.h1
+            identifiers:
+              - properties:
+                  - content:
+                      - val: My Orders
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Logout

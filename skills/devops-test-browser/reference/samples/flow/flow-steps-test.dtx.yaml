@@ -1,0 +1,92 @@
+note: Unit test for if/while/do UI steps
+configuration:
+  vars:
+    TEST_ENDPOINT: ${stub('http://flow-steps')}
+    whileText: '0'
+    doText: '0'
+steps:
+  - run: flow-steps.dtv.yaml
+  - log: After stub
+  - open:
+      url: '${TEST_ENDPOINT}'
+  - with:
+      steps:
+        - if:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'If:'
+            steps:
+              - log: Found If text field
+        - if:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'If_Does_Not_Exist:'
+            stepTimeout: 5s
+            steps:
+              - log: ERROR found If_Does_Not_Exist
+        - while:
+            note: regex is used for content because js is not supported
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'While:'
+                  - content:
+                      - regex: '[1-3]'
+            stepTimeout: 5s
+            steps:
+              - log: Iteration for while loop
+              - assign:
+                  object: html.inputtext
+                  identifiers:
+                    - properties:
+                        - label: 'While:'
+                  properties:
+                    - content:
+                        - var: whileText
+              - log: Read value ${whileText} from While text field
+              - assign:
+                  note: Increment the whileText value. Doing so in the type step has
+                    unwanted side effects
+                  vars:
+                    whileText: ${++whileText}
+              - log: Incremented whileText to ${whileText}
+              - type:
+                  object: html.inputtext
+                  identifiers:
+                    - properties:
+                        - label: 'While:'
+                  value: '${whileText}'
+        - do:
+            note: regex is used for content because js is not supported
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Do:'
+                  - content:
+                      - regex: '[1-3]'
+            stepTimeout: 5s
+            steps:
+              - log: Iteration for do-while loop
+              - assign:
+                  object: html.inputtext
+                  identifiers:
+                    - properties:
+                        - label: 'Do:'
+                  properties:
+                    - content:
+                        - var: doText
+              - log: Read value ${doText} from Do text field
+              - assign:
+                  note: Increment the doText value. Doing so in the type step has
+                    unwanted side effects
+                  vars:
+                    doText: ${++doText}
+              - log: Incremented doText to ${doText}
+              - type:
+                  object: html.inputtext
+                  identifiers:
+                    - properties:
+                        - label: 'Do:'
+                  value: '${doText}'

@@ -1,0 +1,52 @@
+note: Login as admin and validate admin console access
+configuration:
+  profile: edge
+  vars:
+    APP_CycleStore_URL: http://10.134.60.215:3000/
+    Email: admin@senditcycles.com
+    Password: admin123
+steps:
+  - open:
+      url: '${APP_CycleStore_URL}'
+  - with:
+      steps:
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Login
+        - type:
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Email
+            value: '${Email}'
+        - type:
+            object: html.inputpassword
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Password
+            value: '${Password}'
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Sign In
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Admin
+  - with:
+      steps:
+        - verify:
+            object: html.h1
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Admin Console

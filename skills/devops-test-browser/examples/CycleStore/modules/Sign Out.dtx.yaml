@@ -1,0 +1,21 @@
+note: Extracted from Checkout Product.dtx.yaml
+configuration: {}
+steps:
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: ../SendIt Cycles - Premium Mountain Bikes_jh3dll.dti.jpeg#3697
+            object: html.p
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Pending
+            use: double_click
+        - click:
+            shot: ../SendIt Cycles - Premium Mountain Bikes_3evnzx.dti.jpeg#3753
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Logout

@@ -1,0 +1,17 @@
+note: |
+  This is to show that a module can read values from the caller, and set
+  values that can be read by the caller.
+  Note that STATUS is an IN variable by default.
+configuration:
+  vars:
+    STATUS: {}
+    STATUS_OUT:
+      expr: '${STATUS}'
+      modifier: out
+steps:
+  - log: Within the status module. STATUS is ${STATUS}, STATUS_OUT is ${STATUS_OUT}
+  - assign:
+      vars:
+        STATUS_OUT: Y
+  - log: Still within the status module. STATUS is still ${STATUS}, STATUS_OUT is
+      ${STATUS_OUT}

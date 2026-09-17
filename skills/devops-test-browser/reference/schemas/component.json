@@ -1,0 +1,56 @@
+{
+  "$schema" : "http://json-schema.org/draft-07/schema#",
+  "$id" : "https://www.hcl-software.com/schema/devops/test/Component/2026/07",
+  "type" : "object",
+  "properties" : {
+    "note" : {
+      "type" : "string"
+    },
+    "meta" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "string"
+      }
+    },
+    "url" : {
+      "format" : "val-uri-reference",
+      "type" : "string"
+    },
+    "icon" : {
+      "format" : "val-uri-reference",
+      "type" : "string"
+    },
+    "type" : {
+      "$ref" : "#/definitions/ComponentType"
+    },
+    "dependencies" : {
+      "$ref" : "#/definitions/ComponentDependencyArray"
+    }
+  },
+  "additionalProperties" : false,
+  "definitions" : {
+    "ComponentDependency" : {
+      "oneOf" : [ {
+        "title" : "url",
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "properties" : {
+          "url" : {
+            "type" : "string"
+          }
+        },
+        "additionalProperties" : false
+      } ]
+    },
+    "ComponentDependencyArray" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/definitions/ComponentDependency"
+      }
+    },
+    "ComponentType" : {
+      "enum" : [ "web" ]
+    }
+  }
+}

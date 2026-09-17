@@ -1,0 +1,36 @@
+note: Storefront smoke navigation and filter coverage
+configuration:
+  profile: edge
+  vars:
+    APP_SendItCycles_Shop_URL: http://10.134.60.215:3000/shop
+steps:
+  - open:
+      note: Open shop landing
+      url: '${APP_SendItCycles_Shop_URL}'
+  - with:
+      note: Shop page interactions
+      steps:
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: XC
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Trail
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Enduro
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Shop

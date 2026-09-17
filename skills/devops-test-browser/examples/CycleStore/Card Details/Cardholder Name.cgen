@@ -1,0 +1,18 @@
+{
+  "name" : "Cardholder Name",
+  "version" : "0.0.1",
+  "categoryId" : "2e5c8d35-2d9c-4285-9c8d-352d9c528523",
+  "parentGenerator" : "Function",
+  "globalProperties" : {
+    "randomDistribution" : "false",
+    "duplicatesAllowed" : "true",
+    "blankPercentage" : "0"
+  },
+  "configurations" : [ {
+    "name" : "Default",
+    "weightage" : 100.0,
+    "properties" : {
+      "function" : "f(First Name).concat(' ').concat(f(Last Name))"
+    }
+  } ]
+}

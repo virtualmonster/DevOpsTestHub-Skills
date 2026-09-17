@@ -1,0 +1,146 @@
+note: Generated from recorded traffic
+configuration:
+  vars:
+    TEST_ENDPOINT: ${stub('http://multi-tab')}
+steps:
+  - run: html-controls.dtv.yaml
+  - open:
+      note: Open url
+      url: '${TEST_ENDPOINT}'
+  - with:
+      note: HTML Controls with CSS
+      steps:
+        - click:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                locators:
+                  - above:
+                      object: html.inputpassword
+                      properties:
+                        - label: 'Password:'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                  - content: sachin
+                locators:
+                  - above:
+                      object: html.inputpassword
+                      properties:
+                        - label: 'Password:'
+            value: sachin
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Tab1
+        - open:
+            note: New Page
+            url: ${TEST_ENDPOINT}/page1.html
+            attach: 'true'
+            context: window1
+  - with:
+      note: New Page
+      context: window1
+      steps:
+        - click:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                  - content: tab1
+            value: tab1
+        - press: enter
+  - with:
+      note: HTML Controls with CSS
+      steps:
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Tab2
+        - open:
+            note: New Page
+            url: ${TEST_ENDPOINT}/page2.html
+            attach: 'true'
+            context: window2
+  - with:
+      note: New Page
+      context: window2
+      steps:
+        - click:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                  - content: tab2
+            value: tab2
+        - press: enter
+  - with:
+      note: HTML Controls with CSS
+      steps:
+        - click:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                locators:
+                  - above:
+                      object: html.inputpassword
+                      properties:
+                        - label: 'Password:'
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Tab3
+        - open:
+            note: Drag and Drop List
+            attach: 'true'
+            context: window3
+  - with:
+      note: Drag and Drop List
+      context: window3
+      steps:
+        - wait: 350ms
+        - click:
+            object: html.li
+            identifiers:
+              - properties:
+                  - content: Item 5
+            use: drag
+            to:
+              object: html.li
+              identifiers:
+                - offset: below
+                  properties:
+                    - content: Item 1
+  - with:
+      note: Drag and Drop List
+      context: window3
+      steps:
+        - click:
+            object: html.li
+            identifiers:
+              - properties:
+                  - content: Item 4
+            use: drag
+            to:
+              object: html.li
+              identifiers:
+                - offset: above
+                  properties:
+                    - content: Item 3

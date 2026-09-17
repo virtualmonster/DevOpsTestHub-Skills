@@ -1,0 +1,5 @@
+note: Run all tests in all dirs except modules
+tests:
+  - url: '**.dtx.yaml'
+    excludes:
+      - '**/modules/**'

@@ -1,0 +1,30 @@
+{
+  "name" : "Email",
+  "version" : "0.0.1",
+  "categoryId" : "87764f3b-f424-4bfd-b64f-3bf4249bfd5d",
+  "parentGenerator" : "Function",
+  "globalProperties" : {
+    "randomDistribution" : "false",
+    "duplicatesAllowed" : "true",
+    "blankPercentage" : "0"
+  },
+  "configurations" : [ {
+    "name" : "ibm",
+    "weightage" : 40.0,
+    "properties" : {
+      "function" : "f(First Name).concat(f(Last Name)).concat('@ibm.com')"
+    }
+  }, {
+    "name" : "google",
+    "weightage" : 30.0,
+    "properties" : {
+      "function" : "f(First Name).concat(f(Last Name)).concat('@google.com')"
+    }
+  }, {
+    "name" : "outlook",
+    "weightage" : 30.0,
+    "properties" : {
+      "function" : "f(First Name).concat(f(Last Name)).concat('@outlook.com')"
+    }
+  } ]
+}

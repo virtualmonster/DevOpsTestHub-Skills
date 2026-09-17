@@ -1,0 +1,10 @@
+note: DO NOT CHANGE WITHOUT MODIFYING SIBLING
+configuration:
+  cache: 'true'
+  stepTimeout: 3s
+  vars:
+    VAR1: abc
+    VAR2: xyz
+steps:
+  - log: Testing
+  - wait: 1s

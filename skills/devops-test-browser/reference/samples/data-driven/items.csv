@@ -1,0 +1,7 @@
+USER_ID,ITEM_ID,ITEM_NAME,QUANTITY
+2,i900,Apples,4
+2,i902,Bananas,12
+2,i903,Grapes,7
+3,i902,Bananas,6
+1,i900,Apples,2
+1,i901,Oranges,3

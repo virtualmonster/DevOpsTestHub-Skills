@@ -1,0 +1,22 @@
+configuration:
+  vars:
+    FOO:
+      expr: Always just foo
+      modifier: local
+    ZED: parent ZED
+    NOT_AFFECTED: Just in parent
+steps:
+  - run: ../utils/var-funcs.dtx.yaml
+  - run:
+      url: 5cols-child.dtx.yaml
+      dataset: 5cols.csv
+      in:
+        FOO: '${FOO}'
+        MAPPED_BAZ:
+          expr: BAZ
+          type: column
+        ZED:
+          expr: QUX
+          type: column
+  - log: ${describeAllVars(null, ['FOO', 'BAR', 'BAZ', 'MAPPED_BAZ', 'QUX', 'ZED',
+      'NOT_AFFECTED'])}

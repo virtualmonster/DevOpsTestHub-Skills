@@ -1,0 +1,26 @@
+configuration:
+  cache: 'true'
+  vars:
+    isVarDefined:
+      expr: v => eval('typeof ' + v) !== 'undefined'
+      type: js
+      modifier: out
+    varToString:
+      expr: "(v,u='#undefined',n='#null') => \n   isVarDefined(v) ? eval(v) === null\
+        \ ? n : '' + eval(v) : u\n"
+      type: js
+      modifier: out
+    describeVar:
+      expr: "(p, v) => { \n  let name = (p !== null ? p + \"_\" : \"\") + v\n  return\
+        \ name + \": \" + varToString(name)\n}\n"
+      type: js
+      modifier: out
+    describeAllVars:
+      expr: |
+        (p,vs) => {
+          let ret = describeVar(p, vs[0])
+          vs.slice(1).forEach(i => ret += ", " + describeVar(p, i))
+          return ret
+        }
+      type: js
+      modifier: out

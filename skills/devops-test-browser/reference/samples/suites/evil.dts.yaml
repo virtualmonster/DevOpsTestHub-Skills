@@ -1,0 +1,17 @@
+configuration:
+  concurrent: '2'
+  profiles:
+    - chrome
+    - edge
+  sequential: 'true'
+tests:
+  - evil-1.dtx.yaml
+  - url: evil-2.dtx.yaml
+    profiles:
+      - chrome
+  - url: evil-wild*.dtx.yaml
+    excludes:
+      - evil-wild2.dtx.yaml
+  - url: evil-4.dtx.yaml
+    profiles:
+      - edge

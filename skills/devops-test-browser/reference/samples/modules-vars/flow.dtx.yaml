@@ -1,0 +1,34 @@
+note: |
+  Scripts can contain the flow steps "while", and "if".
+  A "pause" step can be used to create delays.
+configuration:
+  vars:
+    i: '11'
+    j: '0'
+steps:
+  - log: Launch countdown
+  - while:
+      note: We decrement i by 1 within the condition expression
+      condition: --i > 0
+      steps:
+        - log: T minus ${i}...
+        - if:
+            condition: i==6
+            steps:
+              - log: We have a go for main engine start
+        - wait: 1s
+  - log: Booster ignition and liftoff!
+  - while:
+      condition: j <= 8
+      steps:
+        - wait: 2s
+        - assign:
+            note: We increment j by 2 using a variable assignment
+            vars:
+              j: ${j+2}
+        - log: T plus ${j}...
+  - log: Booster separation complete
+  - verify:
+      - i == 0
+      - j == 10
+  - log: We have a successful launch

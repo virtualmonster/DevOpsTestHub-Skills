@@ -1,0 +1,13 @@
+steps:
+  - with:
+      context: FOO
+      steps:
+        - run: open-app.dtx.yaml
+  - with:
+      context: BAR
+      steps:
+        - log: other thing
+  - with:
+      context: FOO
+      steps:
+        - click: {}

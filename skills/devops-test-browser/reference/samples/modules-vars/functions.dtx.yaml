@@ -1,0 +1,11 @@
+configuration:
+  vars:
+    add_10:
+      expr: |
+        n => n + 10
+      type: js
+      modifier: out
+    say_hello:
+      expr: n => 'Hello ' + n
+      type: js
+      modifier: out

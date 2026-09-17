@@ -1,0 +1,21 @@
+includes:
+  - sub/env-child.dte.yaml
+users:
+  ACTOR1:
+    username: Alice
+    password:
+      expr: password1
+      type: secret
+    token: sometoken
+  ACTOR2:
+    username: Frank
+    password:
+      expr: password3
+      type: secret
+    token: sometoken3
+secrets: mySecretCollection
+vars:
+  PARENT_ENV_VAR: parentVal
+  PARENT_ENV_VAR_FROM_SECRET:
+    expr: mystery
+    type: secret

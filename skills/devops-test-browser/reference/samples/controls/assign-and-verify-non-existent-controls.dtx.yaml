@@ -1,0 +1,65 @@
+note: Generated from recorded traffic
+configuration:
+  vars:
+    TEST_ENDPOINT: ${stub('http://controls')}
+steps:
+  - run: html-controls.dtv.yaml
+  - open:
+      note: Open url
+      url: '${TEST_ENDPOINT}'
+  - with:
+      note: HTML Controls with CSS
+      steps:
+        - assign:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                locators:
+                  - above:
+                      object: html.inputpassword
+                      properties:
+                        - label: 'Password:'
+            properties:
+              - exist:
+                  - var: CheckIfInputControlExists
+        - if:
+            condition: CheckIfInputControlExists
+            steps:
+              - type:
+                  object: html.inputtext
+                  identifiers:
+                    - properties:
+                        - label: 'Name:'
+                      locators:
+                        - above:
+                            object: html.inputpassword
+                            properties:
+                              - label: 'Password:'
+                  value: testname
+        - assign:
+            object: html.inputpassword
+            identifiers:
+              - properties:
+                  - label: ThisControlDoesNotExist
+            properties:
+              - exist:
+                  - var: CheckIfInvalidControlExists
+            stepTimeout: 1s
+        - verify:
+            object: html.inputpassword
+            identifiers:
+              - properties:
+                  - label: ThisControlDoesNotExist
+            properties:
+              - exist: 'false'
+            stepTimeout: 1s
+        - if:
+            condition: '!CheckIfInvalidControlExists'
+            steps:
+              - type:
+                  object: html.inputemail
+                  identifiers:
+                    - properties:
+                        - label: 'Email:'
+                  value: test@gmail.com

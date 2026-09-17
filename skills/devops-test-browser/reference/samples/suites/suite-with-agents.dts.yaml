@@ -1,0 +1,22 @@
+configuration:
+  profiles:
+    - edge
+    - chrome
+    - name: other
+      capabilities:
+        - app: wow
+    - firefox
+  sequential: 'true'
+tests:
+  - url: test1.dtx.yaml
+    profiles:
+      - edge
+      - chrome
+      - other
+  - url: test2.dtx.yaml
+    profiles:
+      - chrome
+  - url: test3.dtx.yaml
+    profiles:
+      - firefox
+  - another-suite-with-agents.dts.yaml

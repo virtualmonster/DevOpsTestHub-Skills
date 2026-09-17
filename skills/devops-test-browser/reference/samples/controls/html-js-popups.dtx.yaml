@@ -1,0 +1,61 @@
+note: Generated from recorded traffic
+configuration:
+  vars:
+    TEST_ENDPOINT: ${stub('http://popupboxes')}
+steps:
+  - run: html-js-popups.dtv.yaml
+  - log: After stub
+  - with:
+      steps:
+        - open:
+            note: Open url
+            url: '${TEST_ENDPOINT}'
+        - click:
+            object: html.inputbutton
+            identifiers:
+              - properties:
+                  - content: Show alert box
+        - click:
+            object: window.ok
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Show confirm box
+        - click:
+            object: window.ok
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Show confirm box
+        - verify:
+            object: window.popup
+            properties:
+              - message: Press a button!
+        - click:
+            object: window.cancel
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Show prompt box
+        - click:
+            object: window.cancel
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Show prompt box
+        - type:
+            object: window.popup
+            value: added test in prompt
+        - click:
+            object: window.ok
+        - click:
+            object: html.inputbutton
+            identifiers:
+              - properties:
+                  - content: Show alert box
+        - click:
+            object: window.ok

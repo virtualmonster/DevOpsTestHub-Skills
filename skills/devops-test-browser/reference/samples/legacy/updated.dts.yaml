@@ -1,0 +1,9 @@
+note: DO NOT CHANGE WITHOUT MODIFYING SIBLING
+configuration:
+  concurrent: '0'
+  stepTimeout: 3s
+  vars:
+    VAR1: abc
+    VAR2: xyz
+tests:
+  - updated.dtx.yaml

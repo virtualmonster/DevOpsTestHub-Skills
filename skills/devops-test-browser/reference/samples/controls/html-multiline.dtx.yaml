@@ -1,0 +1,68 @@
+note: Unit test for multi line with Text Area control
+configuration:
+  vars:
+    Multi_Line_text: |-
+      -----BEGIN CERTIFICATE-----
+      MIIFRTCCAy2gAwIBAgIRAMmyyLykclGUQBYNuTUvU7YwDQYJKoZIhvcNAQELBQAw
+      SzEiMCAGA1UECgwZdHAtazhzLm5vbnByb2QuaGNscG5wLmNvbTElMCMGA1UECwwc
+      dHAtazhzLm5vbnByb2QuaGNscG5wLmNvbSBDQTAeFw0yNTEyMjIwNTUxMjlaFw0y
+      NzAxMjMwNTUxMjlaMEgxIjAgBgNVBAoMGXRwLWs4cy5ub25wcm9kLmhjbHBucC5j
+      b20xIjAgBgNVBAMMGXRwLWs4cy5ub25wcm9kLmhjbHBucC5jb20wggGiMA0GCSqG
+      SIb3DQEBAQUAA4IBjwAwggGKAoIBgQDJPDMy1bUc6W1vplKN49tGTi2QXZqL5pyR
+      yXJZfW2l6lkiZP2IdfF0GaFSALGMUNZ6MyBMgTy8xhq0i87FEv5bDdKfX8zgZZBq
+      h7e4Dxz3D1/rJInb1JaOHU8kCTI7JjkKrkkPa9L17O1TlmcevQE1E3xFa5gfPY09
+      8AfZ180QMmBT8vqugGsvE5YniuZDhG0F/idconERVUQntBmQSULRhOydJwWk9qQ0
+      QboBbGr08fsOgVf4DZzhsdrVtJ6ylRc22EDuTS1hmBfq/Wpcq4gjcmPBwjflNFA6
+      iQbHVcShRM7MGTIoZHELoTNU3QAuR6DgF8uBzU5w1kUOnhGYGen+8MYjOfTxanxC
+      MkzDeoaif0ZaJgwINTF4fEz7ujWv+TkmVuDurrQspMR8K9TYUqoFwi7FfUrPgMt0
+      Xg6BSbG3uiBidrqW7qD4olDK62HGRvRvIgmerAxcvUnPJcjmRM3NZQTXNFMp4X2p
+      M7ZSb7Qd0Euzvdg0zDwnBci8rHDTXpkCAwEAAaOBpjCBozAJBgNVHRMEAjAAMBMG
+      A1UdJQQMMAoGCCsGAQUFBwMBMEEGA1UdEQQ6MDiCGXRwLWs4cy5ub25wcm9kLmhj
+      bHBucC5jb22CGyoudHAtazhzLm5vbnByb2QuaGNscG5wLmNvbTAdBgNVHQ4EFgQU
+      eOJ3Imoh45ngRJXtaV9NelY8XDowHwYDVR0jBBgwFoAU+HkIi1UOemYaKifETjqU
+      Jow/fhcwDQYJKoZIhvcNAQELBQADggIBACAQzVMuosazgLEfAYaiGsrlSPSArGoK
+      7lag69W01wVKpEqp+thAqtuyGQL+lccy8+XYrBJ2zab4ZxSPJ7/Mvb0WP/MJ0WKy
+      LCN3pOyzkUc9M4a8Wo3Qqgp26PwuQhVimQF9A/VdOSq1SIuOs6nE+HGeKtsARjxq
+      3zdQJyrafTnkgz/kB9HpTm7QV0fg+3SVn03MzfqUNGH1kh08Ob7LBhyIb2Vs/bDN
+      GzH9rWJEv6/UEg+N/XY8P+bMdXboJYXxwCXMGj/TPdaskPrK9+uG9NfC6T/adc1C
+      puzzKGyMDnLh01Trd4o9OQ5B+t0c3K6TW1I7ZEiCckYROhqtq9PjC1+RC4j7dsXl
+      Q+S9pgDZLCBt5qTwN/o5e0C29+vBET5E61QNCV4gVdk5Bl79bfQcOqm8NgdwiqLL
+      s3d8DtzKIJ31p9x1s8Mrob1zhrRT0XAUGENDbZwhSTXOk+D90C2SGYmEB9zEVbdo
+      7XpSYrUdds5vqBPmrCw8oHlfJ4zQCoUgjvQt1xnoY7JZp+RJOBg0rmbtZBIy2kgk
+      gaONz/K4goPHpu+79fuZt52GNvtvwvTEbBap03DCBTHoc99D3LkHJP0DfREnZ18l
+      wTzYgScB+5xSKZE0TrVWUJvLF44OXdiRwEp3fliAQ5J1wW83iZh4a90AAxJ3yO8V
+      JKu9D2gy02Mi
+      -----END CERTIFICATE-----
+    TEST_ENDPOINT: ${stub('http://multiline')}
+    assignVariable: initialValue
+steps:
+  - run: html-multiline.dtv.yaml
+  - log: After stub
+  - with:
+      note: Selenium Friendly Form
+      steps:
+        - open:
+            url: '${TEST_ENDPOINT}'
+        - click:
+            object: html.textarea
+            identifiers:
+              - properties:
+                  - placeholder: Type text and press Enter to submit
+        - type:
+            object: html.textarea
+            identifiers:
+              - properties:
+                  - placeholder: Type text and press Enter to submit
+            value: '${Multi_Line_text}'
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Submit
+        - verify:
+            object: html.textarea
+            identifiers:
+              - properties:
+                  - id: outputArea
+            properties:
+              - content: '${Multi_Line_text}'

@@ -1,0 +1,9 @@
+note: |
+  When this script is invoked by another script, variable values are inheritted
+  from the calling script. In this example, if the calling script has a value for
+  COLOR, that value will be used and the default value specified, blue, will be ignored.
+configuration:
+  vars:
+    COLOR: blue
+steps:
+  - log: The scoped COLOR variable value is ${COLOR}

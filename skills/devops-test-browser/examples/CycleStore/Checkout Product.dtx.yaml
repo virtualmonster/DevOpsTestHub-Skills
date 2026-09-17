@@ -1,0 +1,325 @@
+note: Generated from recorded traffic using edge 145.0.3800.65
+configuration:
+  profile: edge
+  vars:
+    APP_CycleStore_URL:
+      expr: http://10.134.60.215:3000/
+      type: val
+      modifier: in
+    Email:
+      expr: stuart@hcl.com
+      type: val
+      modifier: in
+    Password: password123
+    First_Name:
+      expr: Stuart
+      type: val
+      modifier: in
+    Last_Name:
+      expr: Walker
+      type: val
+      modifier: in
+    TYPE_2:
+      expr: '0123456789'
+      type: val
+      modifier: in
+    Address:
+      expr: 101 The Street
+      type: val
+      modifier: in
+    City:
+      expr: The Town
+      type: val
+      modifier: in
+    State_Province:
+      expr: London
+      type: val
+      modifier: in
+    Zip_Code:
+      expr: ABC 123
+      type: val
+      modifier: in
+    Country:
+      expr: United Kingdom
+      type: val
+      modifier: in
+    Cardholder_Name:
+      expr: S Walker
+      type: val
+      modifier: in
+    Card_Number:
+      expr: '4111111111111111'
+      type: val
+      modifier: in
+    CVV:
+      expr: '123'
+      type: val
+      modifier: in
+steps:
+  - open:
+      note: Open CycleStore
+      url: '${APP_CycleStore_URL}'
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_x2wzva.dti.jpeg#111
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Shop Now
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_nqi3uv.dti.jpeg#177
+            object: html.img
+            identifiers:
+              - properties:
+                  - src:
+                      - val: /api/images/2-trailblazer-elite.jpg
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_7kmjcz.dti.jpeg#335
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: L
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_py54dp.dti.jpeg#464
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Add to Cart
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - verify:
+            shot: SendIt Cycles - Premium Mountain Bikes_i3fd7c.dti.jpeg#593
+            object: html.h1
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Shopping Cart
+            properties:
+              - content:
+                  - val: Shopping Cart
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_i3fd7c.dti.jpeg#593
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Checkout
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_laj32z.dti.jpeg#651
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Email
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_l7pdhs.dti.jpeg#720
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Email
+            value: '${Email}'
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_d7guge.dti.jpeg#792
+            object: html.inputpassword
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Password
+            value: '${Password}'
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_hmwjmh.dti.jpeg#932
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Sign In
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_vhdibp.dti.jpeg#990
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: |-
+                          🛒
+                          1
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_3b27lj.dti.jpeg#1183
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Checkout
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_k5ugqk.dti.jpeg#1242
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: First Name *
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_kfcki3.dti.jpeg#1370
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: First Name *
+            value: '${First_Name}'
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_7fsti7.dti.jpeg#1501
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Last Name *
+            value: '${Last_Name}'
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_5jng3g.dti.jpeg#1633
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Email *
+            value: '${Email}'
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_irp7uj.dti.jpeg#1764
+            object: html.inputtextfield
+            identifiers:
+              - properties:
+                  - xpath:
+                      - val: //div[@id='root']/div/main/div/div/div/form/section/div[3]/input
+                locators:
+                  - inside:
+                      object: html.div
+                      properties:
+                        - content:
+                            - val: Phone *
+            value: '${TYPE_2}'
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_b66ceh.dti.jpeg#1895
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Address *
+            value: '${Address}'
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_bawzj4.dti.jpeg#2026
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: City *
+            value: '${City}'
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_7fkoao.dti.jpeg#2157
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: State/Province *
+            value: '${State_Province}'
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_fotima.dti.jpeg#2289
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Zip Code *
+            value: '${Zip_Code}'
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_3keeyp.dti.jpeg#2420
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Country *
+            value: '${Country}'
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_5rcdu6.dti.jpeg#2559
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Cardholder Name *
+            value: '${Cardholder_Name}'
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_lm4uq3.dti.jpeg#2821
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Card Number *
+            value: '4111111111111111'
+        - select:
+            shot: SendIt Cycles - Premium Mountain Bikes_4h3t2f.dti.jpeg#2952
+            object: html.select
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Month *
+            value: '09'
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_7yn47q.dti.jpeg#3086
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: CVV *
+        - type:
+            shot: SendIt Cycles - Premium Mountain Bikes_ll3ll6.dti.jpeg#3214
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: CVV *
+            value: '${CVV}'
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_kjkvxu.dti.jpeg#3474
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Complete Purchase
+  - with:
+      note: SendIt Cycles - Premium Mountain Bikes
+      steps:
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_jh3dll.dti.jpeg#3697
+            object: html.p
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Pending
+            use: double_click
+        - click:
+            shot: SendIt Cycles - Premium Mountain Bikes_3evnzx.dti.jpeg#3753
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Logout

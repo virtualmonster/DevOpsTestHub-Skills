@@ -1,0 +1,32 @@
+note: Unit test for html controls
+configuration:
+  vars:
+    TEST_ENDPOINT: ${stub('http://controls')}
+    assignVariable: initialValue
+steps:
+  - run: html-controls.dtv.yaml
+  - log: After stub
+  - with:
+      steps:
+        - open:
+            url: '${TEST_ENDPOINT}'
+        - click:
+            object: html.div
+            identifiers:
+              - properties:
+                  - content: Drag me
+            use: drag
+            to:
+              object: html.div
+              identifiers:
+                - properties:
+                    - content: Drop here
+        - verify:
+            object: html.div
+            identifiers:
+              - properties:
+                  - id: droppable
+            properties:
+              - content: |-
+                  Drop here
+                  Drag me

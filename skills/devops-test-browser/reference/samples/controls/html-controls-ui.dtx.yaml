@@ -1,0 +1,208 @@
+note: Unit test for html controls
+configuration:
+  vars:
+    TEST_ENDPOINT: ${stub('http://controls')}
+    assignVariable: initialValue
+steps:
+  - run: html-controls.dtv.yaml
+  - log: After stub
+  - with:
+      steps:
+        - open:
+            url: '${TEST_ENDPOINT}'
+        - click:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                locators:
+                  - above:
+                      object: html.inputpassword
+                      properties:
+                        - label: 'Password:'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                locators:
+                  - above:
+                      object: html.inputpassword
+                      properties:
+                        - label: 'Password:'
+            value: testname
+        - press: enter
+        - assign:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                locators:
+                  - above:
+                      object: html.inputpassword
+                      properties:
+                        - label: 'Password:'
+            properties:
+              - content:
+                  - var: assignVariable
+        - click:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                locators:
+                  - above:
+                      object: html.inputemail
+                      properties:
+                        - label: 'Email:'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                locators:
+                  - above:
+                      object: html.inputemail
+                      properties:
+                        - label: 'Email:'
+            value: '${assignVariable}'
+        - click:
+            object: html.inputpassword
+            identifiers:
+              - properties:
+                  - label: 'Password:'
+        - type:
+            object: html.inputpassword
+            identifiers:
+              - properties:
+                  - label: 'Password:'
+            value: pass
+        - click:
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label: 'Email:'
+        - type:
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label: 'Email:'
+            value: test@gmail.com
+        - verify:
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label: 'Email:'
+            properties:
+              - content: test@gmail.com
+              - xpath: //input[@id='email']
+        - click:
+            object: html.textarea
+            identifiers:
+              - properties:
+                  - placeholder: Write your message
+        - click:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                locators:
+                  - above:
+                      object: html.inputpassword
+                      properties:
+                        - label: 'Password:'
+            use: right_click
+        - type:
+            object: html.textarea
+            identifiers:
+              - properties:
+                  - placeholder: Write your message
+            value: sample control test
+        - select:
+            object: html.select
+            identifiers:
+              - properties:
+                  - label: 'Country:'
+            value: USA
+        - click:
+            object: html.inputradio
+            identifiers:
+              - properties:
+                  - label: Male
+        - click:
+            object: html.inputradio
+            identifiers:
+              - properties:
+                  - label: Female
+        - click:
+            object: html.inputcheckbox
+            identifiers:
+              - properties:
+                  - label: "\n     Subscribe to newsletter\n  "
+        - verify:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Save
+            properties:
+              - enabled: 'false'
+              - visible: 'true'
+        - click:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Name:'
+                locators:
+                  - above:
+                      object: html.inputpassword
+                      properties:
+                        - label: 'Password:'
+            use: double_click
+        - click:
+            object: html.div
+            identifiers:
+              - properties:
+                  - content: Drag me
+            use: drag
+            to:
+              object: html.div
+              identifiers:
+                - properties:
+                    - content: Drop here
+        - verify:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content: Regex Link (0)
+            properties:
+              - content:
+                  - ends: (0)
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Frame Name:'
+            value: abc
+        - type:
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label: 'Frame Email:'
+            value: abc@gmail.com
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Submit
+        - type:
+            object: html.inputcolor
+            identifiers:
+              - properties:
+                  - label: 'Pick a Color:'
+            value: '#000000'
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content: Hover Link
+            use: hover

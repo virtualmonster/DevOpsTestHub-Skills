@@ -1,0 +1,8 @@
+note: |
+  Executes all tests in tests directory excluding any whose name
+  contains the string skip but not the string no-skip
+tests:
+  - url: tests/*.dtx.yaml
+    excludes:
+      - tests/*skip*
+      - '!tests/*no-skip*'

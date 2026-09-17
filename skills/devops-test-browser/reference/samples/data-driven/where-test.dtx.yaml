@@ -1,0 +1,16 @@
+configuration:
+  vars:
+    CUSTOMER: '2'
+    ITEM_QUANTITY:
+      expr: '4'
+      type: js
+steps:
+  - run:
+      url: log-item.dtx.yaml
+      dataset:
+        url: items.csv
+        where:
+          USER_ID:
+            val: '${CUSTOMER}'
+          QUANTITY:
+            js: value => value > ITEM_QUANTITY

@@ -1,0 +1,9 @@
+configuration:
+  vars:
+    FOO: {}
+    BAR: {}
+    MAPPED_BAZ: {}
+    ZED: {}
+steps:
+  - run: ../utils/var-funcs.dtx.yaml
+  - log: ${describeAllVars(null, ['FOO', 'BAR', 'BAZ', 'MAPPED_BAZ', 'QUX', 'ZED'])}

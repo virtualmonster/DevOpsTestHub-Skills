@@ -1,0 +1,21 @@
+{
+  "$schema" : "http://json-schema.org/draft-07/schema#",
+  "$id" : "https://www.hcl-software.com/schema/devops/test/ExceptionExecution/2026/07",
+  "type" : "object",
+  "properties" : {
+    "enabled" : {
+      "format" : "js",
+      "type" : "string"
+    },
+    "note" : {
+      "type" : "string"
+    },
+    "meta" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "string"
+      }
+    }
+  },
+  "additionalProperties" : false
+}

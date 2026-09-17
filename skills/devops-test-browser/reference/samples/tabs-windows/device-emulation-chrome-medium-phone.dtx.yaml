@@ -1,0 +1,41 @@
+note: Generated from recorded traffic
+configuration:
+  profile: edge+medium.phone
+  vars:
+    TEST_ENDPOINT: ${stub('http://controls')}
+    LANG_REGION_CODE: en-US
+steps:
+  - run: html-controls.dtv.yaml
+  - open:
+      note: Open url
+      url: '${TEST_ENDPOINT}'
+  - with:
+      note: HTML Controls with CSS
+      steps:
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Tab1
+        - open:
+            note: New Page
+            url: ${TEST_ENDPOINT}/page1.html
+            attach: 'true'
+            context: window1
+  - with:
+      note: New Page
+      context: window1
+      steps:
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Show language-region code
+        - wait: 1s
+        - verify:
+            object: html.div
+            identifiers:
+              - properties:
+                  - id: langRegionCode
+            properties:
+              - content: '${LANG_REGION_CODE}'

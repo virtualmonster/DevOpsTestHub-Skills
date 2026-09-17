@@ -1,0 +1,23 @@
+configuration:
+  vars:
+    DEPLOYMENT_URL: https://master-hcl.tp-k8s.nonprod.hclpnp.com
+    USERNAME: peter.taylor
+    _PASSWORD: peter.taylor
+steps:
+  - open:
+      url: '${DEPLOYMENT_URL}'
+  - verify:
+      identifiers:
+        - properties:
+            - tagname: label
+            - label: username
+            - focus: 'true'
+  - type: '${USERNAME}'
+  - press: tab
+  - verify:
+      identifiers:
+        - properties:
+            - label: password
+            - focus: 'true'
+  - type: '${_PASSWORD}'
+  - press: enter

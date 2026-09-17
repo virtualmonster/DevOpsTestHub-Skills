@@ -1,0 +1,12 @@
+steps:
+  - iterate:
+      dataset: a.csv
+      steps:
+        - log: A row with ${COL_A} ${COL_B} ${DERIVED_FROM_COL_C}
+      vars:
+        COL_A:
+          expr: COL_A
+          type: column
+        DERIVED_FROM_COL_C:
+          expr: COL_C
+          type: column

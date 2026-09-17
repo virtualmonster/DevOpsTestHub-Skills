@@ -1,0 +1,41 @@
+configuration:
+  dataset: ${ENVIRONMENT_NAME}/users.csv
+  vars:
+    ENVIRONMENT_NAME: dev
+    USERNAME:
+      note: implicit IN modifer enabling the value to be set from enclosing scope
+      expr: USERNAME
+      type: column
+    PASSWORD:
+      note: issue 1 - explicitly define column names for IN variables so that the
+        editor doesnt get confused - or change editor logic.
+      expr: PASSWORD
+      type: column
+    NUMBER:
+      modifier: local
+    CSC:
+      modifier: local
+    EXPIRY_LONG:
+      modifier: local
+    EXPIRY_SHORT:
+      modifier: local
+steps:
+  - log: 'init fetched these values: ${USERNAME} ${PASSWORD}'
+  - log: another way to fetch next row...
+  - assign:
+      note: issue 2 - can't auto-map because data structure wouldn't enable it to
+        be explicitly disabled on a per column basis.
+      dataset: ${ENVIRONMENT_NAME}/credit-cards.csv
+      vars:
+        NUMBER:
+          type: column
+        CSC:
+          type: column
+        EXPIRY_LONG:
+          expr: EXPIRY
+          type: column
+        EXPIRY_SHORT:
+          note: MM/YYYY -> MM/YY
+          expr: EXPIRY_LONG.slice(0, 3) + EXPIRY_LONG.slice(-2)
+          type: js
+  - log: 'fetched these values: ${NUMBER} ${CSC} ${EXPIRY_SHORT}'

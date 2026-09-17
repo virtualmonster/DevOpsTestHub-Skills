@@ -1,0 +1,63 @@
+note: Unit test for UI actions
+configuration:
+  vars:
+    TEST_ENDPOINT: ${stub('http://contact-us')}
+steps:
+  - run: contact-us-locator.dtv.yaml
+  - log: After stub
+  - with:
+      steps:
+        - open:
+            url: '${TEST_ENDPOINT}'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - placeholder: Name
+            value: Tester
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - placeholder: Name
+                locators:
+                  - leftof:
+                      object: html.textarea
+                      properties:
+                        - placeholder: Message
+                  - above:
+                      object: html.inputemail
+                      properties:
+                        - placeholder: Email address
+            value: Testing
+        - type:
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - placeholder: Email address
+            value: unit-test@uta.test
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - placeholder: Subject
+            value: Complaint
+        - type:
+            object: html.textarea
+            identifiers:
+              - properties:
+                  - placeholder: Message
+            value: Hi from unit test
+        - select:
+            object: html.select
+            identifiers:
+              - properties:
+                  - placeholder: Country
+            value: India
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content: Reset
+                locators:
+                  - position: '1'

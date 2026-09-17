@@ -1,0 +1,11 @@
+tests:
+  - 01 Storefront Smoke Navigation.dtx.yaml
+  - 02 Register User and Basic Navigation.dtx.yaml
+  - 03 Add Product To Cart.dtx.yaml
+  - 04 Checkout Required Field Validation.dtx.yaml
+  - 05 Checkout Invalid Card Validation.dtx.yaml
+  - 06 Successful Checkout Purchase.dtx.yaml
+  - 07 Admin Login and Console Access.dtx.yaml
+  - 08 Admin Products and Categories Tabs.dtx.yaml
+  - 09 Admin API Docs and Logout.dtx.yaml
+  - 10 User Orders Page Access.dtx.yaml

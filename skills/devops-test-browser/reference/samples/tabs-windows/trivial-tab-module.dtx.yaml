@@ -1,0 +1,18 @@
+note: Unit test for trivial tab using run context
+steps:
+  - click:
+      object: html.inputtext
+      identifiers:
+        - properties:
+            - label: Other
+  - type:
+      object: html.inputtext
+      identifiers:
+        - properties:
+            - label: Other
+      value: Hello
+  - click:
+      object: html.html
+      identifiers:
+        - properties:
+            - content: Other

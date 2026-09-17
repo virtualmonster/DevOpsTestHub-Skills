@@ -1,0 +1,26 @@
+note: Generated from recorded traffic using edge 145.0.3800.65
+configuration:
+  profile: edge
+  vars:
+    APP_CycleStore_URL: http://10.134.60.215:3000/
+    Email: stuart@hcl.com
+    Password: password123
+    First_Name: Stuart
+    Last_Name: Walker
+    TYPE_2: '0123456789'
+    Address: 101 The Street
+    City: The Town
+    State_Province: London
+    Zip_Code: ABC 123
+    Country: United Kingdom
+    Cardholder_Name: S Walker
+    Card_Number: '4111111111111111'
+    CVV: '123'
+steps:
+  - open:
+      note: Open CycleStore
+      url: '${APP_CycleStore_URL}'
+  - run: Add Product To Cart.dtx.yaml
+  - run: Sign In.dtx.yaml
+  - run: Check Out.dtx.yaml
+  - run: Sign Out.dtx.yaml

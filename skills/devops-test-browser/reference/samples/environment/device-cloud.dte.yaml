@@ -1,0 +1,5 @@
+profiles:
+  chrome+medium.phone:
+    device: pCloudy:pixel
+  safari+large.phone:
+    device: pCloudy:iphone

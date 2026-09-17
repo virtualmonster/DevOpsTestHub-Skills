@@ -1,0 +1,20 @@
+note: Unit test for wait UI step
+configuration:
+  vars:
+    TEST_ENDPOINT: ${stub('http://wait-step')}
+    waitTextValue: abc
+steps:
+  - run: wait-step.dtv.yaml
+  - log: After stub
+  - open:
+      url: '${TEST_ENDPOINT}'
+  - with:
+      steps:
+        - wait:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label: 'Wait:'
+                  - content: '${waitTextValue}'
+            stepTimeout: 5s
+        - log: After wait

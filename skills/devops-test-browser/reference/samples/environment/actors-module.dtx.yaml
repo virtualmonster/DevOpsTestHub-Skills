@@ -1,0 +1,37 @@
+configuration:
+  vars:
+    DEFAULT_USERNAME2: def2
+    fallback:
+      expr: (fn, value) => { try { return fn() ?? value; } catch { return value; }
+        }
+      type: js
+steps:
+  - with:
+      user: ACTOR1
+      steps:
+        - log: username for ACTOR1 is ${user('username')}
+        - log: password for ACTOR1 is ${user('password')}
+        - log: token for ACTOR1 is ${user('token')}
+        - log: missing for ACTOR1 with default val is ${fallback(() => user('missing'),
+            'def1')}
+        - log: missing for ACTOR1 with default var is ${fallback(() => user('missing'),
+            DEFAULT_USERNAME2)}
+  - with:
+      user: ACTOR2
+      steps:
+        - log: username for ACTOR2 is ${user('username')}
+        - log: password for ACTOR2 is ${user('password')}
+        - log: token for ACTOR2 is ${user('token')}
+        - log: missing for ACTOR2 with default val is ${fallback(() => user('missing'),
+            'def1')}
+        - log: missing for ACTOR2 with default var is ${fallback(() => user('missing'),
+            DEFAULT_USERNAME2)}
+  - with:
+      steps:
+        - log: username for default scope is ${user('username')}
+        - log: password for default scope is ${user('password')}
+        - log: token for default scope is ${user('token')}
+        - log: missing for default scope with default val is ${fallback(() => user('missing'),
+            'def1')}
+        - log: missing for default scope with default var is ${fallback(() => user('missing'),
+            DEFAULT_USERNAME2)}

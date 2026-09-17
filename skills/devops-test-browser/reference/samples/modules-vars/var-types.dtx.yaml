@@ -1,0 +1,21 @@
+configuration:
+  vars:
+    NUM:
+      type: js
+    BOOL:
+      type: js
+    STR: {}
+    STR_NUM: {}
+    STR_BOOL: {}
+steps:
+  - verify:
+      - typeof NUM === 'number'
+      - typeof BOOL === 'boolean'
+      - typeof STR === 'string'
+      - typeof STR_NUM === 'string'
+      - typeof STR_BOOL === 'string'
+  - log: NUM is ${NUM}
+  - log: BOOL is ${BOOL}
+  - log: STR is ${STR}
+  - log: STR_NUM is ${STR_NUM}
+  - log: STR_BOOL is ${STR_BOOL}

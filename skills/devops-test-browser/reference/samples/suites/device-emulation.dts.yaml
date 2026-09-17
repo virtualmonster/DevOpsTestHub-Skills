@@ -1,0 +1,7 @@
+configuration:
+  profiles:
+    - chrome+medium.phone
+    - safari+large.phone
+  sequential: 'true'
+tests:
+  - simple-open.dtx.yaml

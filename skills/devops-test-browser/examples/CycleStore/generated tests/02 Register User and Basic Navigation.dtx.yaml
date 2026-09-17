@@ -1,0 +1,77 @@
+note: Register a new user and validate post-login navigation
+configuration:
+  profile: edge
+  vars:
+    APP_CycleStore_URL: http://10.134.60.215:3000/
+    Email: ${Date.now()+'@senditcycles.com'}
+    First_Name: Test
+    Last_Name: User
+    Password: password123
+steps:
+  - open:
+      note: Open app root
+      url: '${APP_CycleStore_URL}'
+  - with:
+      steps:
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Register
+  - with:
+      steps:
+        - type:
+            object: html.inputemail
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Email
+            value: '${Email}'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: First Name
+            value: '${First_Name}'
+        - type:
+            object: html.inputtext
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Last Name
+            value: '${Last_Name}'
+        - type:
+            object: html.inputpassword
+            identifiers:
+              - properties:
+                  - label:
+                      - val: Password
+            value: '${Password}'
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Create Account
+  - with:
+      steps:
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Orders
+        - click:
+            object: html.a
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Shop
+        - click:
+            object: html.button
+            identifiers:
+              - properties:
+                  - content:
+                      - val: Logout

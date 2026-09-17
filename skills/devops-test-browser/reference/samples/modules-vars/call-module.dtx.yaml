@@ -1,0 +1,20 @@
+configuration:
+  vars:
+    FOO:
+      expr: calling-foo
+      modifier: local
+    BAR:
+      expr: calling-bar
+      modifier: local
+    BAZ:
+      expr: calling-baz
+      modifier: local
+    MODULE: module.dtx.yaml
+steps:
+  - run: ../utils/var-funcs.dtx.yaml
+  - log: 'CALLER BEFORE: foo ${FOO}, bar ${BAR}, baz: ${varToString("BAZ")}'
+  - run:
+      url: '${MODULE}'
+      in:
+        FOO: mapped using 'in' ${FOO}
+  - log: 'CALLER AFTER: foo ${FOO}, bar ${BAR}, baz: ${varToString("BAZ")}'

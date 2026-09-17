@@ -1,0 +1,10 @@
+note: DO NOT CHANGE WITHOUT MODIFYING SIBLING
+cache: 'true'
+stepTimeout: 3s
+steps:
+  - log: Testing
+  - pause:
+      duration: 1s
+vars:
+  VAR1: abc
+  VAR2: xyz

@@ -1,0 +1,21 @@
+configuration:
+  vars:
+    LOC: dummy.txt
+    LOC_ABS:
+      expr: dummy.txt
+      relative: 'true'
+    LOC_ABS_DOTS:
+      expr: abc/../dummy.txt
+      relative: 'true'
+    LOC_ABS_NUM:
+      expr: '0'
+      relative: 'true'
+    SIMPLE:
+      expr: mods 2/simple-log.dtx.yaml
+      relative: 'true'
+steps:
+  - log: '${LOC}'
+  - log: '${LOC_ABS}'
+  - log: '${LOC_ABS_DOTS}'
+  - log: '${LOC_ABS_NUM}'
+  - run: '${SIMPLE}'
