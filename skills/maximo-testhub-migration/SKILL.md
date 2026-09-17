@@ -249,16 +249,17 @@ applications, records, and controls are available.
    `html.button`); the toolbar app-name `toolbar2-chld_appName` is a `<table>` (`html.table`), and a
    `verify`/`assign` with no `object:` at all resolves to nothing ("Verify undefined … Object not
    found") even when the element is plainly there.
-   - **When an in-iframe control is below the fold, fix the viewport - don't hack the click.** A
-     `js:` locator that `scrollIntoView`s the element does make Test Hub *find* it (the click step
-     passes), but the click then mis-fires across the frame boundary - the element resolves inside
-     `manage-shell_Iframe` while the click coordinates resolve in the wrong frame, so nothing
-     happens and no dialog opens (run 4247: the "Enter Meter Readings" Common Action at y~1153 in a
-     ~1015-1065px iframe viewport). The clean, general fix is a **taller execution browser
-     viewport** (larger pod virtual display / window height) so the control renders on-screen and an
-     ordinary click reaches it - this fixes every off-screen in-iframe control at once, with no
-     per-test locators. Treat a persistently-off-screen recorder control as a viewport/execution
-     issue, not a selector defect, and don't let a `js:`-locator false-pass mask it.
+   - **When an in-iframe control is below the fold, find a resolution-independent trigger - do NOT
+     enlarge the viewport, and do NOT hack the click.** Tests must replay at any resolution, so a
+     fix that depends on the element being in view is unacceptable. A `js:` scrollIntoView locator
+     makes Test Hub *find* the element (the click step passes) but the click then mis-fires across
+     the frame boundary - it resolves inside `manage-shell_Iframe` while the click coordinates
+     resolve in the wrong frame, so nothing happens (run 4247: "Enter Meter Readings" Common Action
+     at y~1153 in a ~1015-1065px iframe viewport - no dialog opened). The right fix is a control
+     that is always present in the DOM regardless of window size: re-ground the flow to trigger the
+     action from a table/tab/toolbar control near the top of the record (for meter readings, the
+     asset's Meters tab has its own meter table) rather than a Common-Actions nav item that sits far
+     down a long list. Never let a `js:`-locator false-pass mask an unreachable control.
 - **Diagnose runs from the results REST API, not just the PDF** (works from a browser logged into
    the Test Hub server): `GET /test/rest/projects/{id}/results/{resultId}/data/views/functional/
    summary/` gives per-step verdicts and stepStatistics; each failing step in the report links a

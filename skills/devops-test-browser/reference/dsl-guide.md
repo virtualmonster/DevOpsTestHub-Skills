@@ -369,6 +369,33 @@ an element that *is itself* an iframe (rich-text editors): `type` against it fai
 WebDriver's clear-then-type sequence **[project run, Maximo RTE]** — skip optional rich-text
 bodies rather than fight it.
 
+## Choosing an identifier — stability first, and never depend on layout
+
+Two hard rules for every element step, so a test replays reliably at **any screen resolution or
+form factor** (the same test may run on a wide desktop pod, a narrow window, or a phone profile):
+
+1. **Never depend on coordinates or on an element being scrolled into view.** Do not use pixel
+   positions, and do not rely on something being "above the fold". If an element is only clickable
+   when the window is a certain size, the test is broken — find a control that is always present in
+   the DOM and let Test Hub resolve it, or trigger the action through a different, always-available
+   path. A "make the viewport taller" fix is not acceptable.
+2. **Prefer a stable identifier, in this order:** `id` → `content` (visible text) → `class` →
+   `label`/`placeholder`/`name`/`data-testid`/`aria-label`. Reach for **`xpath` only when nothing
+   else identifies the element**, and even then prefer an *attribute* xpath (`//button[@id=…]`)
+   over a *positional* one (`//div/div[2]/…`) — positional paths change when a small vs large form
+   factor changes the DOM. When your chosen property is not unique on the page, **do not fall back
+   to xpath — add a relative locator** to disambiguate: `position` (Nth match, 1-based),
+   `inside`/`rightof`/`leftof`/`above`/`below` (anchored to another stable element). "Instance 1 of
+   `class=foo`" is `properties: [{class: [{val: foo}]}], locators: [{position: '1'}]`; "the `foo`
+   to the right of the `Bar` label" is a `rightof` locator.
+
+Prefer operators over positional xpath when an id is dynamic: `id: [{includes: '…'}]`,
+`{starts: '…'}`, `{ends: '…'}`, `{regex: '…'}` match a stable *fragment* of a generated id. Maximo
+grid controls carry data-grid coordinates in the id (`…_tdrow_[C:1]_ttxt-lb[R:0]` = column 1,
+row 0) — those are **layout-independent** (grid position, not screen position), so matching the id
+fragment is stable. Combine several properties in one Widget to AND them (e.g. `id` ends
+`-tab_anchor` **and** `content` is `Work Order`) instead of encoding both in one xpath.
+
 ## Locating elements — `object` + `identifiers`
 
 ```yaml
