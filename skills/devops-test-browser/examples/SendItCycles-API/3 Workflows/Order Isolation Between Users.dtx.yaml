@@ -1,0 +1,89 @@
+note: 'A user cannot see or fetch another user''s order (404 and an empty list for the second user)'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    TOKEN: ''
+    USER_ID: ''
+    EMAIL: ''
+    PASSWORD: ''
+    TOKEN_B: ''
+    USER_B: ''
+    EMAIL_B: ''
+    PASSWORD_B: ''
+    ORDER_ID: ''
+    PARSE:
+      expr: 'b => typeof b === "string" ? JSON.parse(b) : b'
+      type: js
+steps:
+  - run:
+      url: ../modules/Register And Login.dtx.yaml
+      out:
+        TOKEN: {}
+        USER_ID: {}
+        EMAIL: {}
+        PASSWORD: {}
+  - send:
+      note: 'User A places an order for product 3'
+      url: ${BASE_URL}/orders
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${TOKEN}'
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"items":[{"product_id":3,"quantity":1}]}'
+      response:
+        fields:
+          - status-code:
+              - val: '201'
+          - content/id:
+              - var: ORDER_ID
+  - run:
+      url: ../modules/Register And Login.dtx.yaml
+      out:
+        TOKEN: [TOKEN_B]
+        USER_ID: [USER_B]
+        EMAIL: [EMAIL_B]
+        PASSWORD: [PASSWORD_B]
+  - send:
+      note: 'User B fetches user A''s order'
+      url: ${BASE_URL}/orders/${ORDER_ID}
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${TOKEN_B}'
+      response:
+        fields:
+          - status-code:
+              - val: '404'
+          - content/error:
+              - val: 'Order not found'
+  - send:
+      note: 'User B lists their orders'
+      url: ${BASE_URL}/orders
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${TOKEN_B}'
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content:
+              - var: B_ORDERS
+  - verify:
+      - 'PARSE(B_ORDERS).length === 0'
+      - '!PARSE(B_ORDERS).some(o => Number(o.id) === Number(ORDER_ID))'

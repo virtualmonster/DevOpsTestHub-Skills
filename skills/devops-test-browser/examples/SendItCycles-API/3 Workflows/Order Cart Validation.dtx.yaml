@@ -1,0 +1,58 @@
+note: 'Empty cart is rejected with 400 and an unknown product with 404'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    TOKEN: ''
+    USER_ID: ''
+    EMAIL: ''
+    PASSWORD: ''
+steps:
+  - run:
+      url: ../modules/Register And Login.dtx.yaml
+      out:
+        TOKEN: {}
+        USER_ID: {}
+        EMAIL: {}
+        PASSWORD: {}
+  - send:
+      note: 'POST /orders with no items'
+      url: ${BASE_URL}/orders
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${TOKEN}'
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"items":[]}'
+      response:
+        fields:
+          - status-code:
+              - val: '400'
+          - content/error:
+              - val: 'Cart is empty'
+  - send:
+      note: 'POST /orders with an unknown product'
+      url: ${BASE_URL}/orders
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${TOKEN}'
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"items":[{"product_id":99999,"quantity":1}]}'
+      response:
+        fields:
+          - status-code:
+              - val: '404'
+          - content/error:
+              - val: 'Product 99999 not found'

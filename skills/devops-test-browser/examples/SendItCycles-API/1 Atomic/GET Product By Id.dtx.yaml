@@ -1,0 +1,34 @@
+note: 'GET /products/{id} returns the product (seed product 1)'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    PRODUCT_ID: '1'
+steps:
+  - send:
+      note: 'GET /products/1'
+      url: ${BASE_URL}/products/${PRODUCT_ID}
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/id:
+              - val: '${PRODUCT_ID}'
+          - content/name:
+              - var: NAME
+          - content/price:
+              - var: PRICE
+          - content/stock_quantity:
+              - var: STOCK
+          - content/category_name:
+              - var: CATEGORY
+  - verify:
+      - 'Number(PRICE) > 0'
+      - 'Number(STOCK) >= 0'
+      - 'NAME.length > 0 && CATEGORY.length > 0'
+  - log: 'Product ${PRODUCT_ID}: ${NAME} (${CATEGORY}) price ${PRICE}, stock ${STOCK}'

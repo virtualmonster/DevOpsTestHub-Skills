@@ -1,0 +1,22 @@
+note: 'KNOWN ISSUE: a malformed JSON body should return 400 but the host returns 500. Passes once fixed.'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+steps:
+  - send:
+      note: 'POST /auth/login with malformed JSON'
+      url: ${BASE_URL}/auth/login
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{bad json'
+      response:
+        fields:
+          - status-code:
+              - val: '400'

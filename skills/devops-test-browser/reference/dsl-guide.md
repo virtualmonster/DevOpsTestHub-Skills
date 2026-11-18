@@ -16,9 +16,11 @@ Evidence tags used in this guide: **[schema]**, **[sample: path]**, **[project r
 **[live DOM]**. Prefer a construct with a sample behind it; flag anything you can only justify
 from the schema.
 
-Scope: browser testing. The same DSL also covers API (`send`), SQL (`sql`), stubs (`.dtv.yaml`),
-messages (`.dtm.yaml`), transports (`.dtt.yaml`) and load profiles (`.dtp.yaml`) — those files
-exist in `schemas/` for completeness but this skill does not generate them.
+Scope: browser testing, plus API testing via the `send` step — see **`api-guide.md`** for everything
+`send`-specific (request/response fields, captures, schema-driven sends, auth, test design). The same DSL also
+covers SQL (`sql`), stubs (`.dtv.yaml`) and load profiles (`.dtp.yaml`); messages (`.dtm.yaml`) and transports
+(`.dtt.yaml`) are optional reuse mechanisms for API tests. SQL, stubs and load profiles exist in `schemas/` for
+completeness but this skill does not generate them.
 
 ## File types and extensions
 
@@ -31,7 +33,8 @@ exist in `schemas/` for completeness but this skill does not generate them.
 | `.csv` (+ `.csv.metadata`) | Dataset | n/a | Header row = variable names. The `.metadata` XML sidecar is tool-generated; don't hand-author it. |
 | `.ddf` / `.cgen` / `.category` | Generated data | JSON | Data-definition files and generators (see CycleStore). Not present in the product corpus, which uses CSV throughout. |
 | `.dti.jpeg` / `.dti.json` | Smartshot pair | n/a | Recorder screenshot + DOM snapshot, referenced by `shot: <file>.dti.jpeg#<offset>`. Optional; never fabricate one. |
-| `.dtv` / `.dtm` / `.dtt` / `.dtd` / `.dtp` | Stub / Messages / Transport / DB query / Load profile | respective schema | API/perf side of the DSL; out of scope here. |
+| `.dtm` / `.dtt` | Messages / Transport | `messages.json` / `transport.json` | Reusable request/response shapes and auth hooks for API tests — optional; see `api-guide.md`. |
+| `.dtv` / `.dtd` / `.dtp` | Stub / DB query / Load profile | respective schema | Out of scope here. |
 
 ## Anatomy of a script (`.dtx.yaml`)
 
@@ -354,8 +357,9 @@ Alerts, confirms and prompts are first-class objects **[sample: controls/html-js
 
 ### `emulate`, `send`, `sql`
 
-`emulate` (on `open`/`press`/root) replays recorded HTTP cascades for performance emulation;
-`send` and `sql` are the API/DB side. All exist in `script.json`; none are browser-test tools.
+`emulate` (on `open`/`press`/root) replays recorded HTTP cascades for performance emulation and `sql` is the
+DB side; neither is a browser-test tool and this skill does not generate them. **`send` is the API test step —
+see `api-guide.md`.**
 
 ## Frames
 

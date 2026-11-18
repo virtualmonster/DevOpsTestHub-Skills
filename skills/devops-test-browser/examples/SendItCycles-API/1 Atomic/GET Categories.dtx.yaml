@@ -1,0 +1,26 @@
+note: 'GET /categories returns a non-empty list of categories'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    PARSE:
+      expr: 'b => typeof b === "string" ? JSON.parse(b) : b'
+      type: js
+steps:
+  - send:
+      note: 'GET /categories'
+      url: ${BASE_URL}/categories
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content:
+              - var: BODY
+  - verify:
+      - 'PARSE(BODY).length >= 1'
+      - 'PARSE(BODY).every(c => c.id > 0 && typeof c.name === ''string'' && c.name.length > 0)'

@@ -1,0 +1,14 @@
+note: 'Registration, login, token and access-control checks (creates throwaway users)'
+tests:
+  - 2 Auth/GET Admin Categories Forbidden For User.dtx.yaml
+  - 2 Auth/GET Admin Categories No Token.dtx.yaml
+  - 2 Auth/GET Orders Requires Token.dtx.yaml
+  - 2 Auth/GET Profile Invalid Token.dtx.yaml
+  - 2 Auth/GET Profile No Token.dtx.yaml
+  - 2 Auth/GET Profile With Token.dtx.yaml
+  - 2 Auth/POST Login Missing Password.dtx.yaml
+  - 2 Auth/POST Login Unknown User.dtx.yaml
+  - 2 Auth/POST Login Valid.dtx.yaml
+  - 2 Auth/POST Login Wrong Password.dtx.yaml
+  - 2 Auth/POST Register Missing Password.dtx.yaml
+  - 2 Auth/POST Register User.dtx.yaml

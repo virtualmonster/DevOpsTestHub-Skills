@@ -1,0 +1,811 @@
+openapi: 3.0.3
+info:
+  title: SendIt Cycles E-commerce API
+  version: 1.0.0
+  description: |
+    Reverse-engineered from `server/src/index.js`, the route handlers and middleware in
+    github.com/virtualmonster/senditcycles (main), then checked against the live demo instance
+    on 2026-11-18. The repo's own swagger.js defines only metadata and schemas, not paths.
+
+    Each operation carries `x-verified`:
+      - `live`    : exercised against the instance with the result described
+      - `source`  : derived from source only (needs an admin token to exercise)
+      - `live-failing` : exercised and found broken
+
+    Known deviations between the repo docs/source intent and the live behaviour are listed in
+    `x-known-issues` at the bottom of this file. The instance reports `database: SQLite (Demo)`
+    while handlers use Postgres-style error codes, which explains several 500s.
+
+    Auth: JWT bearer, 24h default expiry. The middleware does not check the scheme word, only the
+    token after the first space. Error bodies are `{"error": "<message>"}`.
+servers:
+  - url: http://localhost:3000/api
+    description: Demo docker-compose frontend (nginx on :3000 proxies /api to the backend)
+  - url: http://localhost:5000/api
+    description: Backend published directly by docker-compose.demo.yml
+tags:
+  - name: System
+  - name: Auth
+  - name: Catalog
+  - name: Orders
+  - name: Admin
+security: []
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      tags: [System]
+      summary: Health check
+      x-verified: live
+      responses:
+        '200':
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+                  timestamp: { type: string, format: date-time }
+                  database: { type: string, example: SQLite (Demo) }
+  /images/{filename}:
+    get:
+      operationId: getImage
+      tags: [System]
+      summary: Static product image
+      x-verified: live
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema: { type: string, example: 1-swift-xc-pro.jpg }
+      responses:
+        '200':
+          description: Image bytes
+          content:
+            image/jpeg: { schema: { type: string, format: binary } }
+  /auth/register:
+    post:
+      operationId: registerUser
+      tags: [Auth]
+      summary: Register a user
+      x-verified: live
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, example: user@example.com }
+                password: { type: string }
+                first_name: { type: string, default: '' }
+                last_name: { type: string, default: '' }
+      responses:
+        '201':
+          description: Registered. Live response contains only user.id and token (not the full user object the docs describe).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: User registered successfully }
+                  user:
+                    type: object
+                    properties:
+                      id: { type: integer }
+                  token: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '409':
+          description: Email already exists. Documented and mapped in source for Postgres only; on the SQLite demo a duplicate returned 500 instead.
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+        '500': { $ref: '#/components/responses/ServerError' }
+  /auth/login:
+    post:
+      operationId: loginUser
+      tags: [Auth]
+      summary: Log in
+      x-verified: live
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '200':
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: Login successful }
+                  user: { $ref: '#/components/schemas/User' }
+                  token: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401':
+          description: Unknown email or wrong password ("Invalid credentials")
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+        '500':
+          description: Also returned for a malformed JSON body (observed)
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+  /auth/profile:
+    get:
+      operationId: getProfile
+      tags: [Auth]
+      summary: Current user's profile
+      x-verified: live
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Profile
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                    properties:
+                      created_at: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404':
+          description: User not found
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [Catalog]
+      summary: List categories (ordered by name)
+      x-verified: live
+      responses:
+        '200':
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Category' }
+  /categories/{categoryId}/products:
+    get:
+      operationId: listProductsByCategory
+      tags: [Catalog]
+      summary: List products in a category
+      description: |
+        BROKEN on the live instance: returns 500 for every category. Cause (from source): the SQL
+        references alias `p` but the FROM clause is `products` with no alias.
+      x-verified: live-failing
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema: { type: integer, example: 1 }
+      responses:
+        '200':
+          description: Intended response
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Product' }
+        '500': { $ref: '#/components/responses/ServerError' }
+  /products:
+    get:
+      operationId: listProducts
+      tags: [Catalog]
+      summary: List all products
+      description: No pagination, filtering or query parameters (`?limit=` is ignored). Ordered by created_at descending. Products whose category is missing are omitted (inner join).
+      x-verified: live
+      responses:
+        '200':
+          description: Products
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Product' }
+  /products/{id}:
+    get:
+      operationId: getProduct
+      tags: [Catalog]
+      summary: Get a product
+      x-verified: live
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, example: 1 }
+      responses:
+        '200':
+          description: Product
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Product' } }
+        '404':
+          description: Not found ("Product not found"). Non-numeric ids and 0 also return 404.
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+  /orders:
+    post:
+      operationId: createOrder
+      tags: [Orders]
+      summary: Create an order from cart items
+      description: |
+        Total is computed server-side, status is set to `pending`, stock is decremented per item
+        (confirmed live: product 1 stock fell by the ordered quantity). Quantity sign/type is not
+        validated in source, so negative or zero quantities were deliberately NOT tested.
+      x-verified: live
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [product_id, quantity]
+                    properties:
+                      product_id: { type: integer, example: 1 }
+                      quantity: { type: integer, minimum: 1, example: 1 }
+      responses:
+        '201':
+          description: Order created (line items are not included in this response)
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Order' } }
+        '400':
+          description: '"Cart is empty" (empty or missing items) or "Insufficient stock for product <id>"'
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404':
+          description: '"Product <id> not found"'
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+    get:
+      operationId: listOrders
+      tags: [Orders]
+      summary: List the caller's orders (newest first)
+      x-verified: live
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Orders with line items
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/OrderWithItems' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      tags: [Orders]
+      summary: Get one of the caller's orders
+      description: Another user's order returns 404, not 403.
+      x-verified: live
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, example: 101 }
+      responses:
+        '200':
+          description: Order with line items
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/OrderWithItems' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404':
+          description: '"Order not found" (also for non-numeric ids and other users'' orders)'
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+  # ---------------------------------------------------------------- Admin
+  # All admin routes: authMiddleware then adminMiddleware (role === 'admin').
+  # Live checks used a non-admin token (403) and no token (401) only.
+  /admin/categories:
+    get:
+      operationId: adminListCategories
+      tags: [Admin]
+      summary: List categories (admin)
+      x-verified: source
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Categories ordered by name
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Category' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      operationId: adminCreateCategory
+      tags: [Admin]
+      summary: Create a category
+      x-verified: source
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+                description: { type: string, default: '' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Category' } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409':
+          description: Category already exists (Postgres only per source)
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+  /admin/categories/bulk:
+    post:
+      operationId: adminBulkCreateCategories
+      tags: [Admin]
+      summary: Bulk create categories
+      description: Not transactional; HTTP 201 even if items fail. Check `success` and `errors`.
+      x-verified: source
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [categories]
+              properties:
+                categories:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [name]
+                    properties:
+                      name: { type: string }
+                      description: { type: string }
+      responses:
+        '201':
+          description: Per-item result
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/BulkResult' } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    put:
+      operationId: adminBulkUpdateCategories
+      tags: [Admin]
+      summary: Bulk update categories
+      description: |
+        Route-order caveat: `PUT /admin/categories/:id` is registered BEFORE this route in
+        index.js, so a request to `/bulk` is likely captured by the `:id` handler with id="bulk".
+        Behaviour with an admin token is unverified.
+      x-verified: source
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [categories]
+              properties:
+                categories:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [id]
+                    properties:
+                      id: { type: integer }
+                      name: { type: string }
+                      description: { type: string }
+      responses:
+        '200':
+          description: Per-item result
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/BulkResult' } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /admin/categories/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer }
+    put:
+      operationId: adminUpdateCategory
+      tags: [Admin]
+      summary: Update a category (omitted fields are kept)
+      x-verified: source
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                description: { type: string }
+      responses:
+        '200':
+          description: Updated row
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Category' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404':
+          description: Category not found
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+    delete:
+      operationId: adminDeleteCategory
+      tags: [Admin]
+      summary: Delete a category
+      x-verified: source
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: Category deleted }
+                  category: { $ref: '#/components/schemas/Category' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404':
+          description: Category not found
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+  /admin/products:
+    post:
+      operationId: adminCreateProduct
+      tags: [Admin]
+      summary: Create a product
+      description: price 0 is rejected here (falsy check) but accepted by the bulk endpoint.
+      x-verified: source
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductInput' }
+      responses:
+        '201':
+          description: Created row (no category_name)
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Product' } }
+        '400':
+          description: Missing required fields
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /admin/products/bulk:
+    post:
+      operationId: adminBulkCreateProducts
+      tags: [Admin]
+      summary: Bulk create products
+      description: Not transactional; HTTP 201 even if every item fails. Check `success`.
+      x-verified: source
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [products]
+              properties:
+                products:
+                  type: array
+                  minItems: 1
+                  items: { $ref: '#/components/schemas/ProductInput' }
+      responses:
+        '201':
+          description: Per-item result
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/BulkResult' } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    put:
+      operationId: adminBulkUpdateProducts
+      tags: [Admin]
+      summary: Bulk update products
+      description: Same route-order caveat as categories bulk PUT (`PUT /admin/products/:id` is registered first). Unverified.
+      x-verified: source
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [products]
+              properties:
+                products:
+                  type: array
+                  minItems: 1
+                  items:
+                    allOf:
+                      - type: object
+                        required: [id]
+                        properties:
+                          id: { type: integer }
+                      - $ref: '#/components/schemas/ProductUpdate'
+      responses:
+        '200':
+          description: Per-item result
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/BulkResult' } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /admin/products/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer }
+    put:
+      operationId: adminUpdateProduct
+      tags: [Admin]
+      summary: Update a product (partial)
+      x-verified: source
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductUpdate' }
+      responses:
+        '200':
+          description: Updated row
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Product' } }
+        '400':
+          description: No fields to update
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404':
+          description: Product not found
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+    delete:
+      operationId: adminDeleteProduct
+      tags: [Admin]
+      summary: Delete a product
+      x-verified: source
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: Product deleted }
+                  product: { $ref: '#/components/schemas/Product' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404':
+          description: Product not found
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+  /admin/orders:
+    get:
+      operationId: adminListOrders
+      tags: [Admin]
+      summary: List all orders (all users, no pagination)
+      x-verified: source
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Orders with customer fields and items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/OrderWithItems'
+                    - type: object
+                      properties:
+                        email: { type: string }
+                        first_name: { type: string }
+                        last_name: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /admin/orders/{id}/status:
+    put:
+      operationId: adminUpdateOrderStatus
+      tags: [Admin]
+      summary: Set an order's status
+      description: No validation of allowed values or transitions; stock is not adjusted. Only `pending` is ever set by the code.
+      x-verified: source
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, example: shipped }
+      responses:
+        '200':
+          description: Updated order row
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Order' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404':
+          description: Order not found
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/Error' } }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    BadRequest:
+      description: Validation error (e.g. "Email and password required")
+      content:
+        application/json: { schema: { $ref: '#/components/schemas/Error' } }
+    Unauthorized:
+      description: '"No token provided" (missing/empty) or "Invalid token" (bad/expired)'
+      content:
+        application/json: { schema: { $ref: '#/components/schemas/Error' } }
+    Forbidden:
+      description: '"Admin access required" (verified live with a non-admin token)'
+      content:
+        application/json: { schema: { $ref: '#/components/schemas/Error' } }
+    ServerError:
+      description: '"Database error"'
+      content:
+        application/json: { schema: { $ref: '#/components/schemas/Error' } }
+  schemas:
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        email: { type: string }
+        first_name: { type: string }
+        last_name: { type: string }
+        role: { type: string, example: user }
+    Category:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        created_at: { type: string }
+    Product:
+      type: object
+      properties:
+        id: { type: integer }
+        category_id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        price: { type: number, example: 1499.99 }
+        stock_quantity: { type: integer }
+        image_url: { type: string, example: /api/images/1-swift-xc-pro.jpg }
+        has_sizes: { type: integer, description: '1/0 flag as returned live' }
+        available_sizes: { type: string, example: 'S,M,L,XL' }
+        features: { type: string, nullable: true }
+        specs: { type: string, description: JSON stored as a string, example: '{}' }
+        geometry: { type: string, description: JSON stored as a string, example: '{}' }
+        created_at: { type: string }
+        updated_at: { type: string }
+        category_name: { type: string, example: XC }
+    ProductInput:
+      type: object
+      required: [category_id, name, price, stock_quantity]
+      properties:
+        category_id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        price: { type: number }
+        stock_quantity: { type: integer }
+        image_url: { type: string }
+    ProductUpdate:
+      type: object
+      description: Any subset of the product fields; an empty body returns 400 "No fields to update".
+      properties:
+        category_id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        price: { type: number }
+        stock_quantity: { type: integer }
+        image_url: { type: string }
+    Order:
+      type: object
+      properties:
+        id: { type: integer }
+        user_id: { type: integer }
+        total_price: { type: number }
+        status: { type: string, example: pending }
+        created_at: { type: string }
+        updated_at: { type: string }
+    OrderItem:
+      type: object
+      properties:
+        product_id: { type: integer }
+        quantity: { type: integer }
+        price: { type: number }
+        name: { type: string, nullable: true }
+    OrderWithItems:
+      allOf:
+        - $ref: '#/components/schemas/Order'
+        - type: object
+          properties:
+            items:
+              type: array
+              items: { $ref: '#/components/schemas/OrderItem' }
+    BulkResult:
+      type: object
+      description: Returned with 200/201 even when individual items fail.
+      properties:
+        success: { type: boolean }
+        created: { type: integer }
+        updated: { type: integer }
+        failed: { type: integer }
+        categories: { type: array, items: { $ref: '#/components/schemas/Category' } }
+        products: { type: array, items: { $ref: '#/components/schemas/Product' } }
+        errors:
+          type: array
+          description: Omitted when empty. May contain raw database error text.
+          items:
+            type: object
+            properties:
+              index: { type: integer }
+              error: { type: string }
+x-known-issues:
+  - GET /categories/{categoryId}/products returns 500 for every category (SQL alias bug).
+  - Duplicate registration returns 500 on the SQLite demo; documented/source intent is 409.
+  - Register's 201 body contains only user.id on the live instance.
+  - Malformed JSON bodies produce 500 rather than 400.
+  - PUT /admin/*/bulk may be shadowed by PUT /admin/*/:id (route registration order).
+  - Order quantity is not validated for sign/type in source; negative quantities were not tested.
+  - No pagination, filtering or rate limiting; ?limit= is ignored.

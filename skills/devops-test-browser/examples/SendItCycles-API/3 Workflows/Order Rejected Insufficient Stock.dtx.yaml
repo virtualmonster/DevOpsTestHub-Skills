@@ -1,0 +1,69 @@
+note: 'An order larger than stock is rejected with 400 and the stock is unchanged'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    TOKEN: ''
+    USER_ID: ''
+    EMAIL: ''
+    PASSWORD: ''
+steps:
+  - run:
+      url: ../modules/Register And Login.dtx.yaml
+      out:
+        TOKEN: {}
+        USER_ID: {}
+        EMAIL: {}
+        PASSWORD: {}
+  - send:
+      note: 'Stock before'
+      url: ${BASE_URL}/products/5
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/stock_quantity:
+              - var: STOCK_BEFORE
+  - send:
+      note: 'POST /orders far above stock'
+      url: ${BASE_URL}/orders
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${TOKEN}'
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"items":[{"product_id":5,"quantity":1000000}]}'
+      response:
+        fields:
+          - status-code:
+              - val: '400'
+          - content/error:
+              - val: 'Insufficient stock for product 5'
+  - send:
+      note: 'Stock after'
+      url: ${BASE_URL}/products/5
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/stock_quantity:
+              - var: STOCK_AFTER
+  - verify:
+      - 'Number(STOCK_BEFORE) === Number(STOCK_AFTER)'

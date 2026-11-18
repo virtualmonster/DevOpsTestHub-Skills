@@ -1,0 +1,20 @@
+note: 'A registered user can log in and receives a token and profile summary'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    TOKEN: ''
+    USER_ID: ''
+    EMAIL: ''
+    PASSWORD: ''
+steps:
+  - run:
+      url: ../modules/Register And Login.dtx.yaml
+      out:
+        TOKEN: {}
+        USER_ID: {}
+        EMAIL: {}
+        PASSWORD: {}
+  - verify:
+      - 'typeof TOKEN === ''string'' && TOKEN.length > 20'
+      - 'Number(USER_ID) > 0'
+  - log: 'Logged in as ${EMAIL} (user ${USER_ID})'

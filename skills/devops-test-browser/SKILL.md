@@ -1,13 +1,28 @@
 ---
 name: devops-test-browser
-description: Generate browser/UI test artifacts (test scripts, modules, suites, components, data files) in HCL DevOps Test Hub's YAML/JSON DSL, ready to commit into a Test Hub git-backed test repository. Use when asked to create, generate, or extend browser or UI tests for DevOps Test Hub, or to explain/inspect its test DSL.
+description: Generate browser/UI and API (REST/OpenAPI) test artifacts (test scripts, modules, suites, components, data files) in HCL DevOps Test Hub's YAML/JSON DSL, ready to commit into a Test Hub git-backed test repository. Use when asked to create, generate, or extend browser/UI tests or API tests for DevOps Test Hub, to build API tests from an OpenAPI/Swagger document or a live service, or to explain/inspect its test DSL.
 ---
 
-# DevOps Test Hub — Browser Test Generation
+# DevOps Test Hub — Test Generation (Browser/UI and API)
 
-Generates test artifacts for **HCL DevOps Test Hub** in its native DSL, for **browser/UI
-testing only** (API testing is a separate, not-yet-built extension to this skill — if asked for
-API tests, say so rather than improvising against the `messages.json`/`transport.json` schemas).
+Generates test artifacts for **HCL DevOps Test Hub** in its native DSL:
+
+- **Browser/UI tests** — grounded against the live application's DOM (smartshots or live browser).
+- **API tests** (REST/JSON over HTTP) — hand-authored `send` steps, grounded against the live service and
+  its OpenAPI/source. In the Test Hub 12.0 tech preview recording is the only built-in way to make an API
+  test, so generating the YAML directly is how API tests are currently created by hand.
+
+## Which kind of test?
+
+| The request is about… | Do this |
+|---|---|
+| Pages, clicks, forms, selectors, a web app's UI | The browser workflow in this file; read `reference/dsl-guide.md` |
+| Endpoints, REST/HTTP calls, OpenAPI/Swagger, status codes, tokens, request/response checks | The **API tests** section below; read `reference/api-guide.md` (and `reference/dsl-guide.md` for file types, variables, modules, suites) |
+| Both (UI plus API checks) | Generate them as separate tests in separate folders; share nothing but data conventions |
+| SQL, stubs (`.dtv`), gRPC, load profiles | Not covered. Say so rather than improvising against the other schemas. |
+
+The inventory, decide-once, permission, push-destination and validation rules below apply to both kinds.
+Sections about smartshots, selectors and live-browser driving are browser-only.
 
 ## Operating model
 
@@ -17,8 +32,9 @@ Treat each request as a short evidence-to-result pipeline:
    and live notes.
 2. **Decide once** what to generate, where it belongs, which evidence route to use, whether to
    compose modules, and where to push. Ask only for unresolved decisions in one batch.
-3. **Ground** new selectors using the best available evidence: trusted live notes, usable
-   smartshots, then targeted live-browser discovery for gaps or risk.
+3. **Ground** new selectors (browser) or request/response expectations (API) using the best available
+   evidence: trusted live notes, usable smartshots or the OpenAPI/source, then targeted live-browser
+   discovery or live API calls for gaps or risk.
 4. **Generate minimally**: prefer the smallest independent tests that cover the requested behavior,
    compose proven modules, and add a suite only when multiple tests need coordinated execution.
 5. **Validate and publish**: check paths, schemas, references, diff, branch destination, and
@@ -99,7 +115,9 @@ disambiguate a selector; otherwise proceed and let focused validation expose the
 ## Before generating anything
 
 1. Read `reference/dsl-guide.md` — condensed guide to file types, step syntax, element
-   locating, variables, data-driven testing, and the recommended generation workflow.
+   locating, variables, data-driven testing, and the recommended generation workflow. For API
+   tests also read `reference/api-guide.md` and look at `examples/SendItCycles-API/` (a worked API
+   component with its own `LIVE-NOTES.md`), then continue with the **API tests** section below.
 2. Look at `examples/CycleStore/` — **a bundled reference example only, for illustrating file
    layout and conventions; it is not tied to any real target application.** Real usage always
    targets whatever component/app the user names (see "Before writing anything" below) — never
@@ -128,9 +146,10 @@ disambiguate a selector; otherwise proceed and let focused validation expose the
    execute. Prefer a sample-backed construct over a schema-only one, and say which it is.
 4. Only consult `reference/schemas/*.json` (the raw JSON Schemas) when the guide and samples
    leave a field's validity or shape unclear — `script.json` for tests/modules, `suite.json` for
-   suites, `component.json` for components, `environment.json` for `.dte.yaml`. The other
-   schemas (`messages`, `transport`, `stub`, `databasequery`, `loadprofile`) are the API/perf
-   side; don't use them for browser test generation.
+   suites, `component.json` for components, `environment.json` for `.dte.yaml`. API tests are
+   plain `send` steps in `script.json`; consult `messages.json` / `transport.json` only if you
+   deliberately author reusable `.dtm.yaml` / `.dtt.yaml` files. The `stub`, `databasequery` and
+   `loadprofile` schemas are out of scope; don't use them.
 5. Quick check: is Test Hub's own MCP server (`testhub__*` tools) connected this session? If so,
    read `reference/testhub-mcp-tools.md` and use the discovery and result-review tools. Treat test
    execution as best-effort: the execution API may require a refresh token even when project and
@@ -195,7 +214,9 @@ If the user asks for a broad goal such as “create smoke tests,” propose a sm
 set based on the application's existing flows and ask for confirmation only when scope materially
 changes the files or risk. Do not turn every possible scenario into a regression suite by default.
 
-## Choose the fastest grounded generation route
+## Choose the fastest grounded generation route (browser tests)
+
+For API tests skip this section — there are no smartshots; use the **API tests** section below.
 
 After locating the component and before starting an agent-driven browser session, search the
 component/repository for smartshot artifacts. Do not assume a filename or schema: inspect the
@@ -324,6 +345,39 @@ naming and folder conventions in that repo (`.dtc.yaml`, `.dtx.yaml`, `.dts.yaml
 `.cgen`). If it's a new component, create its `.dtc.yaml` (with the target URL) and, only if
 modules were opted into, a `modules/` subfolder.
 
+## API tests
+
+Use this section for `send`-based tests. Read `reference/api-guide.md` first; the `reference/dsl-guide.md`
+rules for variables, modules, suites and server schema versions still apply. Do not generate API steps by
+pattern-matching other tests — every request body, status code, error string and field name must come from the
+contract, the source, or a live call you made.
+
+1. **Inventory (no questions yet).** Find the OpenAPI/Swagger file or served doc (`/api-docs`, `/swagger.json`,
+   a `swagger.js`-style generator), the router source, and any existing API component in the repo
+   (`.dtc.yaml`, `LIVE-NOTES.md`, modules). Identify the base URL and any proxy/base path, and auth scheme.
+2. **Decide once, in one batch.** Only what is unresolved: target base URL (and whether it is a disposable
+   test/demo host), repo/branch/component folder, which tiers to build (atomic / auth / workflows / known
+   issues), whether state-changing calls are acceptable on that host, push destination.
+3. **Ground live.** Follow the grounding procedure in `api-guide.md`: identify the real service from its
+   headers, probe reads then writes, probe the error paths, record exact statuses and messages, then replicate
+   every planned assertion with an independent client before publishing. On Windows use `curl.exe`, not `curl`.
+   Defects you confirm go into a `Known Issues` folder as tests asserting the correct behaviour.
+4. **Generate minimally and consistently.** Atomic tests first, then auth, then workflows that assert
+   relationships between calls (price × quantity = total, stock delta, list = detail, user isolation). One shared
+   login/setup module. One suite per tier plus an "All" suite that excludes Known Issues. A generator script is
+   fine for many similar files — emit the same validated step shapes everywhere; do not hand-vary them.
+5. **Test data and secrets.** Create throwaway data with per-run generated values (`Date.now()`/random) via
+   `assign`; generate passwords per run; never write a real credential or token into a test or into chat. Admin
+   or other privileged calls need a token the user supplies via an environment secret — never attempt to forge
+   tokens, guess credentials or bypass auth. Do not send inputs the source shows are unvalidated and could
+   corrupt shared data (negative/zero quantities, oversized payloads). State each suite's side effects in the
+   component README.
+6. **Publish placeholders, not internal hosts.** When the examples or tests are going to a public repository,
+   use `http://localhost:<port>/api` or a `BASE_URL` placeholder, not an internal IP/hostname.
+7. **Validate** with the gate in "Validating output", push per the established destination, then ask the user to
+   run `Atomic` → `Auth` → `Workflow`. Bring back each failing step and message; diagnose from it. Record what
+   passed or failed in the construct-status table in `api-guide.md` and in the component's `LIVE-NOTES.md`.
+
 ## Choose the push destination deliberately
 
 Before the first commit/push in a session, use common sense to decide whether the change belongs
@@ -395,3 +449,8 @@ Before treating generated YAML/JSON as done, run this focused gate:
    Inspect the final status to ensure unrelated user changes are neither staged nor overwritten.
 6. After pushing, use TestHub asset discovery to confirm the expected names, branch, and commit are
    visible before attempting execution or result review.
+7. **API tests, extra gates:** every `send` has an explicit `status-code`; field values are in item-list form
+   (`- val:`), `verify` is a list; every expected error string was observed live (or is marked as
+   source-derived); each assertion was replicated by an independent client; no literal passwords/tokens and no
+   internal hosts in anything headed for a public repo; each state-changing test and its side effects are
+   listed in the README; known defects live in `Known Issues` and are excluded from the "All" suite.

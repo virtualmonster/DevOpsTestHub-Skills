@@ -1,0 +1,26 @@
+note: 'KNOWN ISSUE: documented to list a category''s products but the host returns 500 (SQL alias bug). Passes once fixed.'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    PARSE:
+      expr: 'b => typeof b === "string" ? JSON.parse(b) : b'
+      type: js
+steps:
+  - send:
+      note: 'GET /categories/1/products'
+      url: ${BASE_URL}/categories/1/products
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content:
+              - var: BODY
+  - verify:
+      - 'PARSE(BODY).length >= 1'
+      - 'PARSE(BODY).every(p => Number(p.category_id) === 1)'

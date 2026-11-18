@@ -1,0 +1,26 @@
+note: 'GET /products returns products with a price, stock and category'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    PARSE:
+      expr: 'b => typeof b === "string" ? JSON.parse(b) : b'
+      type: js
+steps:
+  - send:
+      note: 'GET /products'
+      url: ${BASE_URL}/products
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content:
+              - var: BODY
+  - verify:
+      - 'PARSE(BODY).length >= 1'
+      - 'PARSE(BODY).every(p => p.id > 0 && p.price > 0 && p.stock_quantity >= 0 && typeof p.category_name === ''string'')'

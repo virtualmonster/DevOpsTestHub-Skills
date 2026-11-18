@@ -1,0 +1,5 @@
+note: 'Atomic, auth and workflow suites (excludes Known Issues)'
+tests:
+  - _Atomic Suite.dts.yaml
+  - _Auth Suite.dts.yaml
+  - _Workflow Suite.dts.yaml

@@ -1,0 +1,100 @@
+note: 'Order 1 x product 1 and 2 x product 2: total = sum of catalog prices x quantities = sum of line items'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    TOKEN: ''
+    USER_ID: ''
+    EMAIL: ''
+    PASSWORD: ''
+    ORDER_ID: ''
+steps:
+  - run:
+      url: ../modules/Register And Login.dtx.yaml
+      out:
+        TOKEN: {}
+        USER_ID: {}
+        EMAIL: {}
+        PASSWORD: {}
+  - send:
+      note: 'Catalog price product 1'
+      url: ${BASE_URL}/products/1
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/price:
+              - var: P1
+  - send:
+      note: 'Catalog price product 2'
+      url: ${BASE_URL}/products/2
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/price:
+              - var: P2
+  - send:
+      note: 'POST /orders with two lines'
+      url: ${BASE_URL}/orders
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${TOKEN}'
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"items":[{"product_id":1,"quantity":1},{"product_id":2,"quantity":2}]}'
+      response:
+        fields:
+          - status-code:
+              - val: '201'
+          - content/id:
+              - var: ORDER_ID
+          - content/total_price:
+              - var: TOTAL
+  - verify:
+      - 'Math.abs(Number(TOTAL) - (Number(P1) + 2 * Number(P2))) < 0.005'
+  - send:
+      note: 'GET /orders/{id}'
+      url: ${BASE_URL}/orders/${ORDER_ID}
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${TOKEN}'
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/items/*:
+              - repeat: {}
+              - fields:
+                  - product_id:
+                      - var: L_PID
+                  - quantity:
+                      - var: L_QTY
+                  - price:
+                      - var: L_PRICE
+  - verify:
+      - '[].concat(L_PID).length === 2'
+      - '[].concat(L_PID).map(Number).sort().join() === ''1,2'''
+      - 'Math.abs(Number(TOTAL) - [].concat(L_PRICE).reduce((s, p, i) => s + Number(p) * Number([].concat(L_QTY)[i]), 0)) < 0.005'

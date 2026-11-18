@@ -22,5 +22,8 @@ and read the browser steps.
 | `legacy/` | Old vs updated file shapes: `pause` → `wait`, root-level `vars`/`cache`/`stepTimeout`/`concurrent` → under `configuration`. |
 | `recorder/` | What the recorder emits (`shot`, `meta`, structured `[{val}]` properties, `position` locators, placeholder steps to delete), plus the product's own login idiom (`verify focus` → shorthand `type` → `press`). |
 
-The full corpus also covers API (`send`), SQL, stubs, messages, transports, gRPC, load
-profiles and browser-driven API recording; those are out of scope for this skill.
+This curated folder is browser-only. The full corpus also covers API (`send`), SQL, stubs, messages,
+transports, gRPC, load profiles and browser-driven API recording. The API patterns this skill uses are
+documented, with corpus paths cited by name, in `../api-guide.md` — the corpus itself is an HCL-internal
+repository, so the API samples are deliberately not copied here. SQL, stubs, gRPC and load profiles remain out
+of scope.

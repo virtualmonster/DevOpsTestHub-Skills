@@ -1,0 +1,20 @@
+note: 'Listing orders without a token returns 401'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+steps:
+  - send:
+      note: 'GET /orders without a token'
+      url: ${BASE_URL}/orders
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '401'
+          - content/error:
+              - val: 'No token provided'

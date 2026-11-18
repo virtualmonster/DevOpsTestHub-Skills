@@ -1,0 +1,23 @@
+note: 'Profile with a garbage token returns 401'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    BAD_TOKEN: not-a-real-token
+steps:
+  - send:
+      note: 'GET /auth/profile with a bad token'
+      url: ${BASE_URL}/auth/profile
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${BAD_TOKEN}'
+      response:
+        fields:
+          - status-code:
+              - val: '401'
+          - content/error:
+              - val: 'Invalid token'

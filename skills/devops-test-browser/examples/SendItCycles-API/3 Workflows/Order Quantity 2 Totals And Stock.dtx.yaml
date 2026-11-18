@@ -1,0 +1,138 @@
+note: 'Order 2 of product 1: total = 2 x catalog price, line item price matches, stock falls by 2'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    PRODUCT_ID: '1'
+    QTY: '2'
+    TOKEN: ''
+    USER_ID: ''
+    EMAIL: ''
+    PASSWORD: ''
+    PARSE:
+      expr: 'b => typeof b === "string" ? JSON.parse(b) : b'
+      type: js
+steps:
+  - run:
+      url: ../modules/Register And Login.dtx.yaml
+      out:
+        TOKEN: {}
+        USER_ID: {}
+        EMAIL: {}
+        PASSWORD: {}
+  - send:
+      note: 'Catalog price and stock before'
+      url: ${BASE_URL}/products/${PRODUCT_ID}
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/price:
+              - var: PRICE
+          - content/stock_quantity:
+              - var: STOCK_BEFORE
+          - content/name:
+              - var: NAME
+  - send:
+      note: 'POST /orders with quantity ${QTY}'
+      url: ${BASE_URL}/orders
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${TOKEN}'
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"items":[{"product_id":${PRODUCT_ID},"quantity":${QTY}}]}'
+      response:
+        fields:
+          - status-code:
+              - val: '201'
+          - content/status:
+              - val: 'pending'
+          - content/id:
+              - var: ORDER_ID
+          - content/total_price:
+              - var: TOTAL
+          - content/user_id:
+              - var: ORDER_USER
+  - verify:
+      - 'Math.abs(Number(TOTAL) - Number(QTY) * Number(PRICE)) < 0.005'
+      - 'Number(ORDER_USER) === Number(USER_ID)'
+  - send:
+      note: 'GET /orders/{id}'
+      url: ${BASE_URL}/orders/${ORDER_ID}
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${TOKEN}'
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/items/*:
+              - repeat: {}
+              - fields:
+                  - product_id:
+                      - var: L_PID
+                  - quantity:
+                      - var: L_QTY
+                  - price:
+                      - var: L_PRICE
+                  - name:
+                      - var: L_NAME
+  - verify:
+      - '[].concat(L_PID).length === 1'
+      - 'Number([].concat(L_PID)[0]) === Number(PRODUCT_ID)'
+      - 'Number([].concat(L_QTY)[0]) === Number(QTY)'
+      - 'Math.abs(Number([].concat(L_PRICE)[0]) - Number(PRICE)) < 0.005'
+      - '[].concat(L_NAME)[0] === NAME'
+  - send:
+      note: 'Catalog stock after'
+      url: ${BASE_URL}/products/${PRODUCT_ID}
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/stock_quantity:
+              - var: STOCK_AFTER
+  - verify:
+      - 'Number(STOCK_BEFORE) - Number(STOCK_AFTER) === Number(QTY)'
+  - send:
+      note: 'GET /orders lists the new order'
+      url: ${BASE_URL}/orders
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${TOKEN}'
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content:
+              - var: MY_ORDERS
+  - verify:
+      - 'PARSE(MY_ORDERS).some(o => Number(o.id) === Number(ORDER_ID))'

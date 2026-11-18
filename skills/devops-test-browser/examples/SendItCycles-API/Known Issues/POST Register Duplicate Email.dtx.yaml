@@ -1,0 +1,47 @@
+note: 'KNOWN ISSUE: registering an existing email should return 409 but the host returns 500. Passes once fixed.'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    EMAIL: unset
+    PASSWORD: unset
+steps:
+  - assign:
+      vars:
+        EMAIL: '${"apitest+" + Date.now() + "-" + Math.floor(Math.random() * 100000) + "@example.com"}'
+        PASSWORD: '${"Pw" + Date.now() + "x" + Math.floor(Math.random() * 1000000)}'
+  - send:
+      note: 'First registration'
+      url: ${BASE_URL}/auth/register
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"email":"${EMAIL}","password":"${PASSWORD}"}'
+      response:
+        fields:
+          - status-code:
+              - val: '201'
+  - send:
+      note: 'Duplicate registration'
+      url: ${BASE_URL}/auth/register
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"email":"${EMAIL}","password":"${PASSWORD}"}'
+      response:
+        fields:
+          - status-code:
+              - val: '409'
+          - content/error:
+              - val: 'Email already exists'

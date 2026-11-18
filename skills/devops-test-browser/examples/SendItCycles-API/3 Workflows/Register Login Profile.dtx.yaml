@@ -1,0 +1,79 @@
+note: 'Register, log in and read the profile; the id is consistent across all three calls'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    EMAIL: unset
+    PASSWORD: unset
+steps:
+  - assign:
+      vars:
+        EMAIL: '${"apitest+" + Date.now() + "-" + Math.floor(Math.random() * 100000) + "@example.com"}'
+        PASSWORD: '${"Pw" + Date.now() + "x" + Math.floor(Math.random() * 1000000)}'
+  - send:
+      note: 'Register'
+      url: ${BASE_URL}/auth/register
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"email":"${EMAIL}","password":"${PASSWORD}","first_name":"Flow","last_name":"Tester"}'
+      response:
+        fields:
+          - status-code:
+              - val: '201'
+          - content/user/id:
+              - var: REG_ID
+  - send:
+      note: 'Log in'
+      url: ${BASE_URL}/auth/login
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"email":"${EMAIL}","password":"${PASSWORD}"}'
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/user/email:
+              - val: '${EMAIL}'
+          - content/user/first_name:
+              - val: 'Flow'
+          - content/user/last_name:
+              - val: 'Tester'
+          - content/token:
+              - var: TOKEN
+          - content/user/id:
+              - var: LOGIN_ID
+  - send:
+      note: 'Read profile'
+      url: ${BASE_URL}/auth/profile
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${TOKEN}'
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/email:
+              - val: '${EMAIL}'
+          - content/id:
+              - var: PROFILE_ID
+  - verify:
+      - 'Number(REG_ID) === Number(LOGIN_ID)'
+      - 'Number(LOGIN_ID) === Number(PROFILE_ID)'

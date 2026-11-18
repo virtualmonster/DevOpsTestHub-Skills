@@ -1,0 +1,46 @@
+note: 'An authenticated user can read their own profile'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    TOKEN: ''
+    USER_ID: ''
+    EMAIL: ''
+    PASSWORD: ''
+steps:
+  - run:
+      url: ../modules/Register And Login.dtx.yaml
+      out:
+        TOKEN: {}
+        USER_ID: {}
+        EMAIL: {}
+        PASSWORD: {}
+  - send:
+      note: 'GET /auth/profile'
+      url: ${BASE_URL}/auth/profile
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+          - auth/bearer/token:
+              - val: '${TOKEN}'
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/email:
+              - val: '${EMAIL}'
+          - content/role:
+              - val: 'user'
+          - content/first_name:
+              - val: 'Api'
+          - content/last_name:
+              - val: 'Test'
+          - content/id:
+              - var: PROFILE_ID
+          - content/created_at:
+              - var: CREATED
+  - verify:
+      - 'Number(PROFILE_ID) === Number(USER_ID)'
+      - 'CREATED.length > 0'

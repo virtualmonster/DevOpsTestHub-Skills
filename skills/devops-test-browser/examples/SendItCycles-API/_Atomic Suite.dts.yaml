@@ -1,0 +1,9 @@
+note: 'Single-call read-only checks (no data written)'
+tests:
+  - 1 Atomic/GET Categories.dtx.yaml
+  - 1 Atomic/GET Health.dtx.yaml
+  - 1 Atomic/GET Product By Id.dtx.yaml
+  - 1 Atomic/GET Product Image.dtx.yaml
+  - 1 Atomic/GET Product Non-Numeric Id.dtx.yaml
+  - 1 Atomic/GET Product Not Found.dtx.yaml
+  - 1 Atomic/GET Products.dtx.yaml

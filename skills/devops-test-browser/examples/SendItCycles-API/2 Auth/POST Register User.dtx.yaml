@@ -1,0 +1,37 @@
+note: 'Registering a new user returns 201 and a token'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    EMAIL: unset
+    PASSWORD: unset
+steps:
+  - assign:
+      vars:
+        EMAIL: '${"apitest+" + Date.now() + "-" + Math.floor(Math.random() * 100000) + "@example.com"}'
+        PASSWORD: '${"Pw" + Date.now() + "x" + Math.floor(Math.random() * 1000000)}'
+  - send:
+      note: 'POST /auth/register'
+      url: ${BASE_URL}/auth/register
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"email":"${EMAIL}","password":"${PASSWORD}","first_name":"Api","last_name":"Test"}'
+      response:
+        fields:
+          - status-code:
+              - val: '201'
+          - content/message:
+              - val: 'User registered successfully'
+          - content/token:
+              - var: TOKEN
+          - content/user/id:
+              - var: USER_ID
+  - verify:
+      - 'typeof TOKEN === ''string'' && TOKEN.length > 20'
+      - 'Number(USER_ID) > 0'

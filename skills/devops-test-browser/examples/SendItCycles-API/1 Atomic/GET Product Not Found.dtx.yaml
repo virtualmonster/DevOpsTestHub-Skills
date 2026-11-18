@@ -1,0 +1,20 @@
+note: 'GET /products/{id} for an unknown id returns 404'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+steps:
+  - send:
+      note: 'GET /products/99999'
+      url: ${BASE_URL}/products/99999
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '404'
+          - content/error:
+              - val: 'Product not found'

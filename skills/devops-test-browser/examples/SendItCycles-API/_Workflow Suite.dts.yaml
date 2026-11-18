@@ -1,0 +1,9 @@
+note: 'Chained flows incl. orders (creates users and orders; reduces stock of products 1, 2, 3)'
+tests:
+  - 3 Workflows/Browse Catalog Consistency.dtx.yaml
+  - 3 Workflows/Order Cart Validation.dtx.yaml
+  - 3 Workflows/Order Isolation Between Users.dtx.yaml
+  - 3 Workflows/Order Quantity 2 Totals And Stock.dtx.yaml
+  - 3 Workflows/Order Rejected Insufficient Stock.dtx.yaml
+  - 3 Workflows/Order Two Products Total.dtx.yaml
+  - 3 Workflows/Register Login Profile.dtx.yaml

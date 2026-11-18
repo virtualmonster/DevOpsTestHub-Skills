@@ -1,0 +1,18 @@
+note: 'GET /products/abc returns 404 rather than a server error'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+steps:
+  - send:
+      note: 'GET /products/abc'
+      url: ${BASE_URL}/products/abc
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '404'

@@ -1,0 +1,52 @@
+note: 'The first product in the list matches its own detail page (id, name, price, stock)'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    PARSE:
+      expr: 'b => typeof b === "string" ? JSON.parse(b) : b'
+      type: js
+steps:
+  - send:
+      note: 'GET /products'
+      url: ${BASE_URL}/products
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content:
+              - var: LIST
+  - assign:
+      vars:
+        FIRST_ID: '${PARSE(LIST)[0].id}'
+        FIRST_NAME: '${PARSE(LIST)[0].name}'
+        FIRST_PRICE: '${PARSE(LIST)[0].price}'
+        FIRST_STOCK: '${PARSE(LIST)[0].stock_quantity}'
+  - send:
+      note: 'GET /products/{id} for the first product'
+      url: ${BASE_URL}/products/${FIRST_ID}
+      request:
+        fields:
+          - method:
+              - val: GET
+          - headers/accept:
+              - val: application/json
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/name:
+              - var: D_NAME
+          - content/price:
+              - var: D_PRICE
+          - content/stock_quantity:
+              - var: D_STOCK
+  - verify:
+      - 'D_NAME === FIRST_NAME'
+      - 'Number(D_PRICE) === Number(FIRST_PRICE)'
+      - 'Number(D_STOCK) === Number(FIRST_STOCK)'

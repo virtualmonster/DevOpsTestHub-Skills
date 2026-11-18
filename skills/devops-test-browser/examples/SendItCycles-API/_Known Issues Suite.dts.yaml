@@ -1,0 +1,5 @@
+note: 'Tests that currently FAIL on the demo host because of known defects; they pass when the defects are fixed'
+tests:
+  - Known Issues/GET Products By Category.dtx.yaml
+  - Known Issues/POST Login Malformed JSON.dtx.yaml
+  - Known Issues/POST Register Duplicate Email.dtx.yaml

@@ -1,0 +1,24 @@
+note: 'Login for an unknown email returns 401'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+steps:
+  - send:
+      note: 'POST /auth/login for an unknown user'
+      url: ${BASE_URL}/auth/login
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"email":"no-such-user-0000@example.com","password":"x"}'
+      response:
+        fields:
+          - status-code:
+              - val: '401'
+          - content/error:
+              - val: 'Invalid credentials'

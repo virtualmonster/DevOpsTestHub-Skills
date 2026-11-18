@@ -1,0 +1,69 @@
+note: 'Registers a throwaway user with generated credentials, logs in, and returns TOKEN, USER_ID, EMAIL, PASSWORD'
+configuration:
+  vars:
+    BASE_URL: http://localhost:5000/api
+    EMAIL:
+      expr: unset
+      modifier: out
+    PASSWORD:
+      expr: unset
+      modifier: out
+    TOKEN:
+      expr: unset
+      modifier: out
+    USER_ID:
+      expr: unset
+      modifier: out
+steps:
+  - assign:
+      vars:
+        EMAIL: '${"apitest+" + Date.now() + "-" + Math.floor(Math.random() * 100000) + "@example.com"}'
+        PASSWORD: '${"Pw" + Date.now() + "x" + Math.floor(Math.random() * 1000000)}'
+  - send:
+      note: 'Register the generated user'
+      url: ${BASE_URL}/auth/register
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"email":"${EMAIL}","password":"${PASSWORD}","first_name":"Api","last_name":"Test"}'
+      response:
+        fields:
+          - status-code:
+              - val: '201'
+          - content/message:
+              - val: 'User registered successfully'
+  - send:
+      note: 'Log in as the generated user'
+      url: ${BASE_URL}/auth/login
+      request:
+        fields:
+          - method:
+              - val: POST
+          - headers/accept:
+              - val: application/json
+          - headers/content-type:
+              - val: application/json
+          - content:
+              - val: '{"email":"${EMAIL}","password":"${PASSWORD}"}'
+      response:
+        fields:
+          - status-code:
+              - val: '200'
+          - content/message:
+              - val: 'Login successful'
+          - content/user/email:
+              - val: '${EMAIL}'
+          - content/user/role:
+              - val: 'user'
+          - content/token:
+              - var: TOKEN
+          - content/user/id:
+              - var: USER_ID
+  - verify:
+      - 'typeof TOKEN === ''string'' && TOKEN.length > 20'
