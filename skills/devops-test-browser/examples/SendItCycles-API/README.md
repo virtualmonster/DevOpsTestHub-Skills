@@ -20,6 +20,6 @@ naming and step shapes — not a target to assume; always ground a new component
 `BASE_URL` is `http://localhost:5000/api` (placeholder); each test declares it as a var so a suite or environment can
 override it. Regenerate with `python _generator/gen_api_tests.py <output-root> <base-url>`.
 
-Status: authored from live-verified API behaviour. In Test Hub the plain `GET Health` test passes and renders;
-many of the others pass and some do not — see `LIVE-NOTES.md` and the construct table in `reference/api-guide.md`
-for what has and has not been confirmed.
+Status: authored from live-verified API behaviour. Test Hub run 6087: Atomic suite 7/7; 9 module-dependent tests failed because
+`out: X: {}` maps nothing (fixed by `X: [X]`, rerun pending). See `LIVE-NOTES.md` and the construct table in
+`reference/api-guide.md`.

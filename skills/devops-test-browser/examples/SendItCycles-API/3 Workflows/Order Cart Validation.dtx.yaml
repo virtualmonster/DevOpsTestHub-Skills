@@ -10,10 +10,10 @@ steps:
   - run:
       url: ../modules/Register And Login.dtx.yaml
       out:
-        TOKEN: {}
-        USER_ID: {}
-        EMAIL: {}
-        PASSWORD: {}
+        TOKEN: [TOKEN]
+        USER_ID: [USER_ID]
+        EMAIL: [EMAIL]
+        PASSWORD: [PASSWORD]
   - send:
       note: 'POST /orders with no items'
       url: ${BASE_URL}/orders

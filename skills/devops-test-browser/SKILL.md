@@ -450,7 +450,8 @@ Before treating generated YAML/JSON as done, run this focused gate:
 6. After pushing, use TestHub asset discovery to confirm the expected names, branch, and commit are
    visible before attempting execution or result review.
 7. **API tests, extra gates:** every `send` has an explicit `status-code`; field values are in item-list form
-   (`- val:`), `verify` is a list; every expected error string was observed live (or is marked as
+   (`- val:`), `verify` is a list; every `run: out:` entry names the caller var (`TOKEN: [TOKEN]`, never
+   `{}`, which maps nothing); every expected error string was observed live (or is marked as
    source-derived); each assertion was replicated by an independent client; no literal passwords/tokens and no
    internal hosts in anything headed for a public repo; each state-changing test and its side effects are
    listed in the README; known defects live in `Known Issues` and are excluded from the "All" suite.

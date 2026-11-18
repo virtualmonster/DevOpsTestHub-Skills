@@ -323,8 +323,10 @@ Groups steps, carries a `note`, and optionally switches `user` (environment acto
       Record_Id: '${Seed_Asset}'
       Unused: null                             # null = explicitly unbound
     out:
-      RESULT: {}                               # same name in caller
-      TOKEN: MY_TOKEN                          # rename
+      RESULT: [RESULT]                         # module var -> caller var; spell the caller name even if identical
+      TOKEN: MY_TOKEN                          # rename (bare-name form is 2026/07 only; use [MY_TOKEN] on 2026/05)
+      # NOT `RESULT: {}` — schema-valid but it maps to nothing: the caller's var stayed empty
+      # [project run: Test Hub result 6087, 9 tests failed on exactly this]. Map direction is module -> caller.
       BOTH: [A, B]                             # fan out to several caller vars
     dataset: seeds.csv                         # run once per row
     inline: 'true'                             # splice into caller scope instead of isolating
@@ -576,7 +578,7 @@ definition-by-definition **[server schema vs `schemas/script.json`]**:
 |---|---|---|---|
 | `Field` (property values) | list of items, or `{items: [...]}` | also a plain scalar | always `key: [{val: …}]` |
 | `VerifyStep` | list of JS expressions, or object form | also a bare JS string | `verify: [expr]` or the object form |
-| `Vars` (`run: out:` targets) | list, or `{vars: [...]}`, or `{}` | also a bare name string | `out: {RESULT: {}}` or `out: {RESULT: [MY_VAR]}` |
+| `Vars` (`run: out:` targets) | list, or `{vars: [...]}`, or `{}` | also a bare name string | `out: {RESULT: [RESULT]}` / `{RESULT: [MY_VAR]}` — always name the caller var. An empty `{}` validates but **maps nothing** [project run 6087] |
 | `Step`, `Action`, `FieldItem`, `Locator` | no `maxProperties: 1` | `maxProperties: 1` | still write exactly one key — the runtime expects it |
 | everything else (18 steps, `if` element form, `assign`, `press`, `open` `context`/`attach`, datasets, `type: column`, `secret`) | identical | identical | — |
 

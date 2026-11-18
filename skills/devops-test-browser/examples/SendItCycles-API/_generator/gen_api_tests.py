@@ -89,8 +89,10 @@ def log(msg):
 
 def run_module(out_map):
     L = ["  - run:", "      url: ../modules/Register And Login.dtx.yaml", "      out:"]
+    # Module var -> caller var. An empty `{}` maps to NOTHING (Test Hub run 6087: TOKEN came back empty),
+    # so always spell the caller name, even when it is the same: `TOKEN: [TOKEN]`.
     for k, v in out_map.items():
-        L.append(f"        {k}: {{}}" if k == v else f"        {k}: [{v}]")
+        L.append(f"        {k}: [{v}]")
     return L
 
 

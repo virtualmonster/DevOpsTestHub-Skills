@@ -154,9 +154,16 @@ steps:
   - send: { ...login..., response: { fields: [ ..., { content/token: [ { var: TOKEN } ] }, { content/user/id: [ { var: USER_ID } ] } ] } }
 ```
 
-Caller: `run: { url: ../modules/Register And Login.dtx.yaml, out: { TOKEN: {}, USER_ID: {}, EMAIL: {}, PASSWORD: {} } }`.
-Rename an output to run the module twice (two users): `out: { TOKEN: [TOKEN_B], USER_ID: [USER_B] }`
-**[schema; rule from the browser guide: `out: {X: {}}` or `out: {X: [Y]}` work on both schema versions]**.
+Caller: `run: { url: ../modules/Register And Login.dtx.yaml, out: { TOKEN: [TOKEN], USER_ID: [USER_ID], EMAIL: [EMAIL], PASSWORD: [PASSWORD] } }`.
+Rename an output to run the module twice (two users): `out: { TOKEN: [TOKEN_B], USER_ID: [USER_B] }`.
+
+**The `out:` map goes module var → caller var, and you must name the caller var even when it is the same.**
+`TOKEN: {}` looks like "same name" but maps to nothing: in Test Hub run 6087 the module ran perfectly
+(register, login and its own `verify TOKEN.length > 20` all passed) yet the caller's `TOKEN`, `EMAIL` and
+`USER_ID` were empty, the next call went out with no bearer token (`{"error":"No token provided"}`), and all 9
+tests that used the module failed **[project run]**. The `[TOKEN]` form is the corpus's own idiom
+(`R: [X, R]`, `_ACCESS_TOKEN: _SERVER_ACCESS_TOKEN`) **[sample: scripts/caches/inout, scripts/hooks/token-transport.dtt.yaml]**;
+whether it fixes the tests is confirmed by the next run — update the table below.
 
 Then `request` of the next call uses `auth/bearer/token: [ { val: '${TOKEN}' } ]`. A failing step aborts the
 whole test; in a suite the next test still runs.
@@ -226,21 +233,30 @@ change at a time.
 ## Server schema versions
 
 Same rules as the browser guide's "Server schema versions" section. For `send`: write field values as item lists
-(`key: [{val: ...}]`), `verify` as a list, `out:` targets as `{X: {}}` / `{X: [Y]}`. The scalar shorthand
-(`status-code: '200'`) is only valid on the newer schema.
+(`key: [{val: ...}]`), `verify` as a list, `out:` targets as `{X: [Y]}` (never `{X: {}}` — it maps nothing). The
+scalar shorthand (`status-code: '200'`) is only valid on the newer schema.
 
 ## Construct status — update this table from Test Hub results
 
 | Construct | Status |
 |---|---|
 | Plain-URL `send`, `method`, `headers/accept`, `status-code`, `content/<field>` equality | **[project run] passing** |
-| `content/<field>` with `- var:` capture, `${VAR}` in url, `verify: [...]` | [authored] — Test Hub result not yet recorded |
-| `request` body via `content` + `headers/content-type`, `POST` | [authored] |
-| `auth/bearer/token` in item-list form | [authored] |
-| Whole-body capture + `PARSE` helper (JSON.parse in a function var) | [authored], highest risk |
-| `content/items/*` + `repeat` array capture | [authored] (sample uses object-keyed arrays) |
-| Module `out:` incl. renamed outputs (`TOKEN: [TOKEN_B]`) | [authored] |
-| Schema-driven `schema: file#operationId` and `servers` resolution | [authored] |
+| `content/<field>` with `- var:` capture, `${VAR}` in url, `verify: [...]` | **[project run 6087] passing** (Atomic 7/7) |
+| `request` body via `content` + `headers/content-type`, `POST` | **[project run 6087] passing** (register, login negatives) |
+| Expected 4xx (`'400'`, `'401'`, `'404'`) plus `content/error` text on a plain `send` | **[project run 6087] passing** |
+| `assign` with `${...}` generating unique values; `assign` reading `${PARSE(X)[0].id}` | **[project run 6087] passing** |
+| `auth/bearer/token` in item-list form | **[project run 6087] passing** (Register Login Profile) |
+| Whole-body capture + `PARSE` helper (JSON.parse in a function var) | **[project run 6087] passing** (Categories, Products, Browse Catalog) |
+| Module `run` with its own sends/assign/verify, `modifier: out` var declarations | **[project run 6087] passing** inside the module |
+| Module `out: {X: {}}` | **[project run 6087] FAILS — maps nothing.** Use `{X: [X]}` |
+| Module `out: {X: [X]}` and renamed `{TOKEN: [TOKEN_B]}` | [authored] — fix pushed as `843d2e9`, rerun pending |
+| `content/items/*` + `repeat` array capture; `[].concat(...)` normalisation | [authored] — not yet reached (sits behind the module) |
+| Stock/total/isolation workflow assertions | [authored] — not yet reached |
+| Schema-driven `schema: file#operationId` and `servers` resolution | [authored] — no test in the suite uses it yet |
 
 After a run, move each row to `[project run] passing` or note the exact failure and the fix.
+**Reading a run:** the report is at `/test/funrep.html#/projects/<p>/results/<id>`; the underlying data is readable
+read-only from a signed-in browser at `/test/rest/projects/<p>/results/<id>/logs?parentId=A` (tree of suite → test →
+step nodes; FAIL verdicts sit on `end.properties.verdict`; each `send` has `request`/`response` children whose
+`end.properties.data` URL returns the exact bytes sent and received). Walk only the FAIL branches.
 See the worked example and its `LIVE-NOTES.md` in `../examples/SendItCycles-API/`.

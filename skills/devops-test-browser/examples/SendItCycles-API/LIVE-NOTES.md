@@ -41,11 +41,19 @@ Source-only, **not exercised**: `PUT /admin/*/bulk` is probably shadowed by `PUT
 for sign/type (negative/zero not sent to a shared host); duplicate product ids in one order bypass the stock check.
 
 ## Test Hub results
-- `GET Health` (plain `send`, item-list values, `status-code`, `content/status`) passes and renders as
-  Send → Send Request / Receive Response → check nodes **[Test Hub]**.
-- The other tests were authored and then replicated live (all assertions passed in an independent client). In Test Hub
-  many pass and some do not; the failures are **not yet diagnosed** — record each here with the step, the message and
-  the fix, and update the construct table in `reference/api-guide.md`.
+- **Run 6087** (`_All API Tests Suite`, repo commit `96438e11`, 14 s): tests 17 pass / 9 fail; steps 317 pass / 17 fail.
+  - `_Atomic Suite` **7/7 pass**: plain `send`, `${VAR}` urls, captures, `verify` lists, whole-body capture with the
+    `PARSE` helper, expected 404s with error text, and a response-header check all work.
+  - `_Auth Suite` 8 pass / 4 fail and `_Workflow Suite` 2 pass / 5 fail. **All 9 failures had one cause**: tests that call
+    `Register And Login` with `out: TOKEN: {}`. The module itself passed (its register, login and `verify` steps all
+    went green), but the caller's `TOKEN`/`EMAIL`/`USER_ID` stayed empty, so the next request carried no bearer token and
+    the API answered `{"error":"No token provided"}` (visible in the failing `response` node's data). `{}` is a schema-valid
+    but empty mapping; the corpus idiom is module var → caller var, so use `TOKEN: [TOKEN]`.
+  - Passing in the same run and therefore confirmed: `auth/bearer/token`, POST bodies, `assign` with generated values,
+    `assign` reading `${PARSE(LIST)[0].id}`, 4xx expectations.
+- **Fix** pushed to the test repo as `843d2e9` (all `out:` entries now `[name]`); rerun result not yet recorded here.
+- Not yet exercised (they sit behind the module): `content/items/*` + `repeat` capture, the stock/total/isolation assertions,
+  renamed outputs (`TOKEN: [TOKEN_B]`), and schema-driven sends.
 - Test Hub 12.0 API **recording** against an imported schema reported "no interactions found" while browsing the app.
   The browser does call `/api/...`; suspected causes are unconfirmed (see `reference/api-guide.md`, "Recording").
 
