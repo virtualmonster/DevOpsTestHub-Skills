@@ -163,7 +163,7 @@ Rename an output to run the module twice (two users): `out: { TOKEN: [TOKEN_B], 
 `USER_ID` were empty, the next call went out with no bearer token (`{"error":"No token provided"}`), and all 9
 tests that used the module failed **[project run]**. The `[TOKEN]` form is the corpus's own idiom
 (`R: [X, R]`, `_ACCESS_TOKEN: _SERVER_ACCESS_TOKEN`) **[sample: scripts/caches/inout, scripts/hooks/token-transport.dtt.yaml]**;
-whether it fixes the tests is confirmed by the next run — update the table below.
+the rerun (result 6217, commit `843d2e94`) went **26/26 green**, so this is confirmed.
 
 Then `request` of the next call uses `auth/bearer/token: [ { val: '${TOKEN}' } ]`. A failing step aborts the
 whole test; in a suite the next test still runs.
@@ -249,9 +249,10 @@ scalar shorthand (`status-code: '200'`) is only valid on the newer schema.
 | Whole-body capture + `PARSE` helper (JSON.parse in a function var) | **[project run 6087] passing** (Categories, Products, Browse Catalog) |
 | Module `run` with its own sends/assign/verify, `modifier: out` var declarations | **[project run 6087] passing** inside the module |
 | Module `out: {X: {}}` | **[project run 6087] FAILS — maps nothing.** Use `{X: [X]}` |
-| Module `out: {X: [X]}` and renamed `{TOKEN: [TOKEN_B]}` | [authored] — fix pushed as `843d2e9`, rerun pending |
-| `content/items/*` + `repeat` array capture; `[].concat(...)` normalisation | [authored] — not yet reached (sits behind the module) |
-| Stock/total/isolation workflow assertions | [authored] — not yet reached |
+| Module `out: {X: [X]}` and renamed `{TOKEN: [TOKEN_B]}` | **[project run 6217] passing** (the fix; two-user isolation test green) |
+| `content/items/*` + `repeat` array capture; `[].concat(...)` normalisation | **[project run 6217] passing** (order totals, two-line order) |
+| Stock/total/isolation workflow assertions (price × qty = total, stock delta, user B cannot see user A's order) | **[project run 6217] passing** |
+| Known Issues suite (3 tests asserting correct behaviour of live defects) | not run yet |
 | Schema-driven `schema: file#operationId` and `servers` resolution | [authored] — no test in the suite uses it yet |
 
 After a run, move each row to `[project run] passing` or note the exact failure and the fix.

@@ -51,9 +51,12 @@ for sign/type (negative/zero not sent to a shared host); duplicate product ids i
     but empty mapping; the corpus idiom is module var → caller var, so use `TOKEN: [TOKEN]`.
   - Passing in the same run and therefore confirmed: `auth/bearer/token`, POST bodies, `assign` with generated values,
     `assign` reading `${PARSE(LIST)[0].id}`, 4xx expectations.
-- **Fix** pushed to the test repo as `843d2e9` (all `out:` entries now `[name]`); rerun result not yet recorded here.
-- Not yet exercised (they sit behind the module): `content/items/*` + `repeat` capture, the stock/total/isolation assertions,
-  renamed outputs (`TOKEN: [TOKEN_B]`), and schema-driven sends.
+- **Fix** pushed to the test repo as `843d2e9` (all `out:` entries now `[name]`).
+- **Run 6217** (`_All API Tests Suite`, commit `843d2e94`, 16.7 s): **26/26 tests pass**, 412 steps, 170 actions. This confirms
+  `out: X: [X]`, renamed outputs (`TOKEN: [TOKEN_B]`), `content/items/*` + `repeat` captures with `[].concat`, and the stock
+  delta, price × quantity = total, two-line total and user-isolation assertions.
+- Still not exercised in Test Hub: the `Known Issues` suite (expected to fail 3/3 while the defects exist) and schema-driven sends
+  (`schema: file#operationId`, `servers` resolution).
 - Test Hub 12.0 API **recording** against an imported schema reported "no interactions found" while browsing the app.
   The browser does call `/api/...`; suspected causes are unconfirmed (see `reference/api-guide.md`, "Recording").
 

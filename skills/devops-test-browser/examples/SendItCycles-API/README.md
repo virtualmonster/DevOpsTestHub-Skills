@@ -20,6 +20,5 @@ naming and step shapes — not a target to assume; always ground a new component
 `BASE_URL` is `http://localhost:5000/api` (placeholder); each test declares it as a var so a suite or environment can
 override it. Regenerate with `python _generator/gen_api_tests.py <output-root> <base-url>`.
 
-Status: authored from live-verified API behaviour. Test Hub run 6087: Atomic suite 7/7; 9 module-dependent tests failed because
-`out: X: {}` maps nothing (fixed by `X: [X]`, rerun pending). See `LIVE-NOTES.md` and the construct table in
-`reference/api-guide.md`.
+Status: Test Hub run 6217 passes all 26 tests in the Atomic, Auth and Workflow suites (after fixing `out: X: {}` to `X: [X]`). The Known Issues
+suite and schema-driven sends are not yet run. See `LIVE-NOTES.md` and the construct table in `reference/api-guide.md`.
